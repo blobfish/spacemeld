@@ -34,7 +34,6 @@ SOURCES += main.cpp \
     interfaceserial.cpp \
     deviceserialmagellan.cpp \
     deviceserialball.cpp \
-    quiter.cpp \
     monitor.cpp \
     deviceserialball4000flx.cpp \
     exportbase.cpp \
@@ -51,7 +50,6 @@ HEADERS += \
     interfaceserial.h \
     deviceserialmagellan.h \
     deviceserialball.h \
-    quiter.h \
     monitor.h \
     deviceserialball4000flx.h \
     exportbase.h \

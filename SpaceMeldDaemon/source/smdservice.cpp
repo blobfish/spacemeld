@@ -11,7 +11,6 @@
 #include "exportx11.h"
 #endif
 
-#include "quiter.h"
 #include "monitor.h"
 #include "axesmutator.h"
 
@@ -91,15 +90,6 @@ void SMDService::start()
 //        QObject::connect(device, SIGNAL(displacementOut(QVector<qint16>)), monitor, SLOT(displacementSlot(QVector<qint16>)));
 //        QObject::connect(device, SIGNAL(buttonOut(qint8, bool)), monitor, SLOT(buttonSlot(qint8, bool)));
     }
-
-    //run for time. I am doing this so I don't have to kill the app. hopefully this will
-    //let the serials return to their natural state. This is all temp.
-//    QCoreApplication *app = qobject_cast<QCoreApplication *>(this->application());
-//    Q_ASSERT(app);
-//    quiter *quit = new quiter(app);
-//    QTimer::singleShot(20000, quit, SLOT(timout())); // 1000 = 1 second.
-//    QObject::connect(quit, SIGNAL(quitApp()), app, SLOT(quit()));
-
 
     settings.setValue(SERVICE_STATUS_STRING, true);
 }
