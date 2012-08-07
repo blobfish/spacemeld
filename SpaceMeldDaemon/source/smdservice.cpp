@@ -63,33 +63,34 @@ void SMDService::start()
         if (((*deviceIt)->info().enabled) && ((*deviceIt)->info().detected))
         {
             if ((*deviceIt)->launch())
+            {
                 qDebug() << (*deviceIt)->info().modelName << " is ready";
+                if ((*deviceIt)->info().output == OutputType::X11)
+                {
+                    ExportX11 *x11 = ExportX11::instance();
+                    x11->initialize();
+
+                    DeviceBase *currentDevice = (*deviceIt);
+
+                    AxesMutator *mutate = new AxesMutator(x11);
+                    mutate->invertAxes(AxesMutator::ALL, true);
+                    mutate->setSensitivity(AxesMutator::ALL, 6.0);
+                    QObject::connect(currentDevice, SIGNAL(displacementOut(QVector<qint16>)), mutate, SLOT(displacementIn(QVector<qint16>)));
+
+                    QObject::connect(mutate, SIGNAL(displacementOut(QVector<qint16>)), x11, SLOT(displacementIn(QVector<qint16>)));
+                    QObject::connect(currentDevice, SIGNAL(buttonOut(qint8, bool)), x11, SLOT(buttonIn(qint8, bool)));
+
+                }
+            }
             else
-                qDebug() << (*deviceIt)->info().modelName << " is NOT ready";
+                qDebug() << (*deviceIt)->info().modelName << " launch FAILED";
         }
     }
-
-    if (!detectedDevices.isEmpty())
-    {
-        ExportX11 *x11 = ExportX11::instance();
-        x11->initialize();
-
-        DeviceBase *device = detectedDevices.at(0);
-
-        AxesMutator *mutate = new AxesMutator(x11);
-        mutate->invertAxes(AxesMutator::ALL, true);
-        mutate->setSensitivity(AxesMutator::ALL, 6.0);
-        QObject::connect(device, SIGNAL(displacementOut(QVector<qint16>)), mutate, SLOT(displacementIn(QVector<qint16>)));
-
-        QObject::connect(mutate, SIGNAL(displacementOut(QVector<qint16>)), x11, SLOT(displacementIn(QVector<qint16>)));
-        QObject::connect(device, SIGNAL(buttonOut(qint8, bool)), x11, SLOT(buttonIn(qint8, bool)));
-
 
         //this is temp
 //        Monitor *monitor = new Monitor(qobject_cast<QCoreApplication *>(this->application()));
 //        QObject::connect(device, SIGNAL(displacementOut(QVector<qint16>)), monitor, SLOT(displacementSlot(QVector<qint16>)));
 //        QObject::connect(device, SIGNAL(buttonOut(qint8, bool)), monitor, SLOT(buttonSlot(qint8, bool)));
-    }
 
     settings.setValue(SERVICE_STATUS_STRING, true);
 }
