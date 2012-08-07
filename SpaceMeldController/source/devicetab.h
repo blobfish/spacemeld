@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTableView>
 #include <QAbstractTableModel>
+#include <QStyledItemDelegate>
 #include "deviceinfo.h"
 #include "deviceconfig.h"
 
@@ -56,6 +57,16 @@ private:
     TableView *view;
     TableModel *model;
     QStackedWidget *stack;
+};
+
+class BoolDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    BoolDelegate(QWidget *parent = 0) : QStyledItemDelegate(parent) {}
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 };
 }
 

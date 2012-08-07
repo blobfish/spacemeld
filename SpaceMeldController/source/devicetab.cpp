@@ -1,4 +1,5 @@
 #include <QtGui/QtGui>
+#include <QComboBox>
 #include "qtservice.h"
 #include "definitions.h"
 #include "devicetab.h"
@@ -50,6 +51,8 @@ void Tab::buildGui()
     view = new TableView(stack);
     model = new TableModel(stack);
     view->setModel(model);
+    BoolDelegate *enabledDelegate = new BoolDelegate(view);
+    view->setItemDelegateForColumn(1, enabledDelegate);
     stack->addWidget(view);
 
     mainLayout->addWidget(stack);
@@ -199,4 +202,35 @@ void TableModel::readData()
 TableView::TableView(QWidget *parent) : QTableView(parent)
 {
 
+}
+
+QWidget* BoolDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QComboBox *box = new QComboBox(parent);
+    box->setEditable(false);
+    return box;
+}
+
+void BoolDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+    QComboBox *box = qobject_cast<QComboBox*>(editor);
+    if (!box)
+        return;
+    box->addItem("True");
+    box->addItem("False");
+    if (index.data().toBool())
+        box->setCurrentIndex(0);
+    else
+        box->setCurrentIndex(1);
+}
+
+void BoolDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QComboBox *box = qobject_cast<QComboBox*>(editor);
+    if (!box)
+        return;
+    if (box->currentIndex() == 0)
+        model->setData(index, true);
+    else
+        model->setData(index, false);
 }
