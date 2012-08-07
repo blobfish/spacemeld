@@ -68,6 +68,16 @@ public:
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 };
+
+class OutputDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    OutputDelegate(QWidget *parent = 0) : QStyledItemDelegate(parent) {}
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+};
 }
 
 #endif // DEVICETAB_H

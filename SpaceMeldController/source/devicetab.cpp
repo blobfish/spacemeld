@@ -53,6 +53,8 @@ void Tab::buildGui()
     view->setModel(model);
     BoolDelegate *enabledDelegate = new BoolDelegate(view);
     view->setItemDelegateForColumn(1, enabledDelegate);
+    OutputDelegate *outputDelegate = new OutputDelegate(view);
+    view->setItemDelegateForColumn(5, outputDelegate);
     stack->addWidget(view);
 
     mainLayout->addWidget(stack);
@@ -115,9 +117,9 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
+    int column = index.column();
     if (role == Qt::DisplayRole)
     {
-        int column = index.column();
         switch (column)
         {
         case 0:
@@ -133,8 +135,13 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
         case 5:
             return OutputType::getString(deviceInfos.at(index.row()).output);
         }
-
-        return QVariant(QString("test"));
+    }
+    if (role == Qt::EditRole)
+    {
+        switch (column)
+        {
+        case 5: return static_cast<int>(deviceInfos.at(index.row()).output);
+        }
     }
     return QVariant();
 }
@@ -233,4 +240,33 @@ void BoolDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
         model->setData(index, true);
     else
         model->setData(index, false);
+}
+
+QWidget* OutputDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QComboBox *box = new QComboBox(parent);
+    box->setEditable(false);
+    return box;
+}
+
+void OutputDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return;
+    QComboBox *box = qobject_cast<QComboBox*>(editor);
+    if (!box)
+        return;
+    for (int position(0); position < OutputType::size(); ++position)
+        box->addItem(OutputType::getString(static_cast<OutputType::Output>(position)));
+    box->setCurrentIndex(index.data(Qt::EditRole).toInt());
+}
+
+void OutputDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return;
+    QComboBox *box = qobject_cast<QComboBox*>(editor);
+    if (!box)
+        return;
+    model->setData(index, box->currentIndex());
 }
