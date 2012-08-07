@@ -58,31 +58,30 @@ void SMDService::start()
     DeviceConfig::clearConfiguredDevices();
     DeviceConfig::writeConfiguredDevices(reconciled);
 
-    DeviceBase *device;
-    foreach(device, detectedDevices)
+    Devices::const_iterator deviceIt;
+    for (deviceIt = detectedDevices.begin(); deviceIt != detectedDevices.end(); ++deviceIt)
     {
-        //config file on active devices.
-        if (!device)
-            continue;
-        qDebug() << endl << "found: " << device->info().modelName;
-        if (device->launch())
-            qDebug() << device->info().modelName << " is ready";
-        else
-            qDebug() << device->info().modelName << " is NOT ready";
+        if (((*deviceIt)->info().enabled) && ((*deviceIt)->info().detected))
+        {
+            if ((*deviceIt)->launch())
+                qDebug() << (*deviceIt)->info().modelName << " is ready";
+            else
+                qDebug() << (*deviceIt)->info().modelName << " is NOT ready";
+        }
     }
 
     if (!detectedDevices.isEmpty())
     {
-//        ExportX11 *x11 = new ExportX11(this->application());
         ExportX11 *x11 = ExportX11::instance();
         x11->initialize();
+
+        DeviceBase *device = detectedDevices.at(0);
 
         AxesMutator *mutate = new AxesMutator(x11);
         mutate->invertAxes(AxesMutator::ALL, true);
         mutate->setSensitivity(AxesMutator::ALL, 6.0);
         QObject::connect(device, SIGNAL(displacementOut(QVector<qint16>)), mutate, SLOT(displacementIn(QVector<qint16>)));
 
-        device = detectedDevices.at(0);
         QObject::connect(mutate, SIGNAL(displacementOut(QVector<qint16>)), x11, SLOT(displacementIn(QVector<qint16>)));
         QObject::connect(device, SIGNAL(buttonOut(qint8, bool)), x11, SLOT(buttonIn(qint8, bool)));
 
