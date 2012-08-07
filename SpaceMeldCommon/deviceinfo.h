@@ -15,7 +15,7 @@ enum SpaceModel {UNKNOWN, BALL_1003, BALL_2003B, BALL_2003C, BALL_3003C, BALL_40
 namespace ConnectionInterfaceType
 {
 enum ConnectionInterface {UNKNOWN, USB, SERIAL, JOYSTICK};
-
+inline int size(){return 4;}
 inline const char* getString(ConnectionInterfaceType::ConnectionInterface index)
 {
     switch(index)
@@ -36,7 +36,7 @@ inline const char* getString(ConnectionInterfaceType::ConnectionInterface index)
 namespace OutputType
 {
 enum Output {UNKNOWN, X11, DBUS};
-
+inline int size(){return 3;}
 inline const char* getString(OutputType::Output index)
 {
     switch(index)
