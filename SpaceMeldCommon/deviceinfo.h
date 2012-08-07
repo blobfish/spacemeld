@@ -20,6 +20,20 @@ enum ConnectionInterface {UNKNOWN, USB, SERIAL, JOYSTICK};
 namespace OutputType
 {
 enum Output {UNKNOWN, X11, DBUS};
+
+inline const char* getString(OutputType::Output index)
+{
+    switch(index)
+    {
+    case 0:
+        break;
+    case 1:
+        return "X11";
+    case 2:
+        return "DBUS";
+    }
+    return "Unknown";
+}
 }
 
 class DeviceInfo

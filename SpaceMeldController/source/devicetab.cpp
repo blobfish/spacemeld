@@ -128,7 +128,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
         case 4:
             return deviceInfos.at(index.row()).path;
         case 5:
-            return deviceInfos.at(index.row()).output;
+            return OutputType::getString(deviceInfos.at(index.row()).output);
         }
 
         return QVariant(QString("test"));
