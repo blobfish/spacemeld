@@ -15,6 +15,22 @@ enum SpaceModel {UNKNOWN, BALL_1003, BALL_2003B, BALL_2003C, BALL_3003C, BALL_40
 namespace ConnectionInterfaceType
 {
 enum ConnectionInterface {UNKNOWN, USB, SERIAL, JOYSTICK};
+
+inline const char* getString(ConnectionInterfaceType::ConnectionInterface index)
+{
+    switch(index)
+    {
+    case 0:
+        break;
+    case 1:
+        return "USB";
+    case 2:
+        return "Serial";
+    case 3:
+        return "Joystick";
+    }
+    return "Unknown";
+}
 }
 
 namespace OutputType

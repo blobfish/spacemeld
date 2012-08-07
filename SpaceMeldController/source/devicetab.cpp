@@ -124,7 +124,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
         case 2:
             return deviceInfos.at(index.row()).detected;
         case 3:
-            return deviceInfos.at(index.row()).interfaceId;
+            return ConnectionInterfaceType::getString(deviceInfos.at(index.row()).interfaceId);
         case 4:
             return deviceInfos.at(index.row()).path;
         case 5:
