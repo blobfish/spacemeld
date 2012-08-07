@@ -193,6 +193,8 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
     default:
         return false;
     }
+    DeviceConfig::clearConfiguredDevices();
+    DeviceConfig::writeConfiguredDevices(this->deviceInfos);
 
     emit dataChanged(index, index);
     return true;
