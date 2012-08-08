@@ -22,4 +22,9 @@
 #define DEVICE_OUTPUT_STRING "DeviceOutput"
 #define DEVICE_DETECTED_STRING "DeviceDetected"
 
+#define AXES_MUTATE_STRING "AxesMutate"
+#define AXES_INVERSE_STRING "AxesInverse"
+#define AXES_SCALE_STRING "AxesScale"
+#define AXES_MAP_STRING "AxesMap"
+
 #endif //DEFINITIONS_H

@@ -55,6 +55,9 @@ public:
     OutputType::Output output;
     qint16 maxDisplacement;//positive number. This is for client convenience only. Driver will not check or adjust.
     qint8 buttonCount;//0 through buttonCount-1
+    QVector<int> inverse;
+    QVector<float> scale;
+    QVector<int> axesMap;
 };
 
 typedef QVector<DeviceInfo> DeviceInfos;

@@ -131,6 +131,10 @@ DeviceInfos SMDService::reconcile(Devices &detectedDevices, const DeviceInfos &c
             {
                 (*detectIt)->info().enabled = (*configuredIt).enabled;
                 (*detectIt)->info().output = (*configuredIt).output;
+                (*detectIt)->info().inverse = (*configuredIt).inverse;
+                (*detectIt)->info().scale = (*configuredIt).scale;
+                (*detectIt)->info().axesMap = (*configuredIt).axesMap;
+
                 copiedConfigure.erase(configuredIt);
                 break;
             }
