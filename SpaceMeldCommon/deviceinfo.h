@@ -18,18 +18,8 @@ enum ConnectionInterface {UNKNOWN, USB, SERIAL, JOYSTICK};
 inline int size(){return 4;}
 inline const char* getString(ConnectionInterfaceType::ConnectionInterface index)
 {
-    switch(index)
-    {
-    case 0:
-        break;
-    case 1:
-        return "USB";
-    case 2:
-        return "Serial";
-    case 3:
-        return "Joystick";
-    }
-    return "Unknown";
+    static const char names[][10] = {"Unknown", "USB", "Serial", "Joystick"};
+    return names[index];
 }
 }
 
@@ -39,16 +29,8 @@ enum Output {UNKNOWN, X11, DBUS};
 inline int size(){return 3;}
 inline const char* getString(OutputType::Output index)
 {
-    switch(index)
-    {
-    case 0:
-        break;
-    case 1:
-        return "X11";
-    case 2:
-        return "DBUS";
-    }
-    return "Unknown";
+    static const char names[][10] = {"Unknown", "X11", "DBUS"};
+    return names[index];
 }
 }
 
