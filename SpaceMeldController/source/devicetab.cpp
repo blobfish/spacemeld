@@ -176,7 +176,7 @@ Qt::ItemFlags TableModel::flags(const QModelIndex &index) const
     switch (index.column())
     {
     case 0:
-        return Qt::NoItemFlags;
+        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     case 1:
         return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
     case 2:
