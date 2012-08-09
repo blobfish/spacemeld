@@ -377,26 +377,22 @@ bool AxesModel::setData(const QModelIndex &index, const QVariant &value, int rol
     if (!index.isValid() || role != Qt::EditRole)
         return false;
 
-
-    //temp
-    return true;
-
-//    switch (index.column())
-//    {
-//    case 1:
-//        deviceInfos[index.row()].enabled = value.toBool();
-//        break;
+    switch (index.column())
+    {
+    case 1:
+        deviceInfos[infoIndex].inverse[index.row()] = value.toInt();
+        break;
 //    case 5:
 //        deviceInfos[index.row()].output = static_cast<OutputType::Output>(value.toInt());
 //        break;
-//    default:
-//        return false;
-//    }
-//    DeviceConfig::clearConfiguredDevices();
-//    DeviceConfig::writeConfiguredDevices(this->deviceInfos);
+    default:
+        return false;
+    }
+    DeviceConfig::clearConfiguredDevices();
+    DeviceConfig::writeConfiguredDevices(this->deviceInfos);
 
-//    emit dataChanged(index, index);
-//    return true;
+    emit dataChanged(index, index);
+    return true;
 }
 
 void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
@@ -421,7 +417,10 @@ void InverseDelegate::setEditorData(QWidget *editor, const QModelIndex &index) c
     QCheckBox *box = qobject_cast<QCheckBox*>(editor);
     if (!box)
         return;
-    box->setCheckState(Qt::Checked);
+    if (index.data() == -1)
+        box->setCheckState(Qt::Checked);
+    else
+        box->setCheckState(Qt::Unchecked);
 }
 
 void InverseDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
@@ -431,6 +430,10 @@ void InverseDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, c
     QCheckBox *box = qobject_cast<QCheckBox*>(editor);
     if (!box)
         return;
+    if (box->isChecked())
+        model->setData(index, -1);
+    else
+        model->setData(index, 1);
 }
 
 void AxesView::openEditors()
