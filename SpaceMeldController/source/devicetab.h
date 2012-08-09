@@ -59,6 +59,15 @@ private:
     QStringList axisLabels;
 };
 
+class AxesView : public QTableView
+{
+    Q_OBJECT
+public:
+    explicit AxesView(QWidget *parent = 0) : QTableView(parent){}
+public slots:
+    void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
+};
+
 class Tab : public QWidget
 {
     Q_OBJECT
@@ -97,6 +106,16 @@ class OutputDelegate : public QStyledItemDelegate
     Q_OBJECT
 public:
     OutputDelegate(QWidget *parent = 0) : QStyledItemDelegate(parent) {}
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+};
+
+class InverseDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    InverseDelegate(QWidget *parent = 0) : QStyledItemDelegate(parent) {}
     QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;

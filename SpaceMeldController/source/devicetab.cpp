@@ -1,5 +1,6 @@
 #include <QtGui/QtGui>
 #include <QComboBox>
+#include <QCheckBox>
 #include "qtservice.h"
 #include "definitions.h"
 #include "devicetab.h"
@@ -63,11 +64,15 @@ void Tab::buildGui()
     view->setItemDelegateForColumn(5, outputDelegate);
     deviceLayout->addWidget(view);
 
-    axesView = new QTableView;
+    axesView = new AxesView;
     axesModel = new AxesModel(deviceContainer, deviceInfos);
     axesView->setModel(axesModel);
+    InverseDelegate *inverseDelegate = new InverseDelegate(axesView);
+    axesView->setItemDelegateForColumn(1, inverseDelegate);
     deviceLayout->addWidget(axesView);
     connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesModel,
+            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesView,
             SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
 
     stack->addWidget(deviceContainer);
@@ -402,4 +407,41 @@ void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelInd
     this->beginResetModel();
     infoIndex = current.row();
     this->endResetModel();
+}
+
+QWidget* InverseDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QCheckBox *box = new QCheckBox(parent);
+    return box;
+}
+
+void InverseDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return;
+    QCheckBox *box = qobject_cast<QCheckBox*>(editor);
+    if (!box)
+        return;
+    box->setCheckState(Qt::Checked);
+}
+
+void InverseDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return;
+    QCheckBox *box = qobject_cast<QCheckBox*>(editor);
+    if (!box)
+        return;
+}
+
+void AxesView::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
+{
+    if (!current.isValid())
+        return;
+    this->openPersistentEditor(this->model()->index(0, 1));
+    this->openPersistentEditor(this->model()->index(1, 1));
+    this->openPersistentEditor(this->model()->index(2, 1));
+    this->openPersistentEditor(this->model()->index(3, 1));
+    this->openPersistentEditor(this->model()->index(4, 1));
+    this->openPersistentEditor(this->model()->index(5, 1));
 }
