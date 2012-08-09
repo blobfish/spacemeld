@@ -65,7 +65,7 @@ class AxesView : public QTableView
 public:
     explicit AxesView(QWidget *parent = 0) : QTableView(parent){}
 public slots:
-    void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
+    void openEditors();
 };
 
 class Tab : public QWidget

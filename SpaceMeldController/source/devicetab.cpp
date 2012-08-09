@@ -72,8 +72,7 @@ void Tab::buildGui()
     deviceLayout->addWidget(axesView);
     connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesModel,
             SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
-    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesView,
-            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+    connect(axesModel, SIGNAL(modelReset()), axesView, SLOT(openEditors()));
 
     stack->addWidget(deviceContainer);
 
@@ -434,10 +433,8 @@ void InverseDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, c
         return;
 }
 
-void AxesView::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
+void AxesView::openEditors()
 {
-    if (!current.isValid())
-        return;
     this->openPersistentEditor(this->model()->index(0, 1));
     this->openPersistentEditor(this->model()->index(1, 1));
     this->openPersistentEditor(this->model()->index(2, 1));
