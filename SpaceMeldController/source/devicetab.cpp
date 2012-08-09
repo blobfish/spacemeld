@@ -9,6 +9,7 @@ using namespace DeviceGui;
 Tab::Tab(QWidget *parent) :
     QWidget(parent)
 {
+    deviceInfos = DeviceConfig::readConfiguredDevices();
     buildGui();
     QtServiceController controller(SERVICE_NAME_STRING);
     if (controller.isRunning())
@@ -49,7 +50,7 @@ void Tab::buildGui()
     stack->addWidget(progressWidget);
 
     view = new TableView(stack);
-    model = new TableModel(stack);
+    model = new TableModel(stack, deviceInfos);
     view->setModel(model);
     BoolDelegate *enabledDelegate = new BoolDelegate(view);
     view->setItemDelegateForColumn(1, enabledDelegate);
@@ -80,7 +81,6 @@ void Tab::driverStatus(bool signal)
         }
         else
         {
-            model->readData();
             stack->setCurrentIndex(2);
         }
     }
@@ -93,7 +93,8 @@ void Tab::driverStatusHelper()
     this->driverStatus(true);
 }
 
-TableModel::TableModel(QObject *parent) : QAbstractTableModel(parent)
+TableModel::TableModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
+    deviceInfos(deviceInfosIn)
 {
     headerStrings.push_back("Name");
     headerStrings.push_back("Enabled");
@@ -199,14 +200,6 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
     emit dataChanged(index, index);
     return true;
 }
-
-void TableModel::readData()
-{
-    beginResetModel();
-    deviceInfos = DeviceConfig::readConfiguredDevices();
-    endResetModel();
-}
-
 
 TableView::TableView(QWidget *parent) : QTableView(parent)
 {
