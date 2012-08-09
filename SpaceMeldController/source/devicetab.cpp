@@ -49,14 +49,27 @@ void Tab::buildGui()
     progress->setMaximum(0);
     stack->addWidget(progressWidget);
 
-    view = new TableView(stack);
-    model = new TableModel(stack, deviceInfos);
+    QWidget *deviceContainer = new QWidget(stack);
+    QVBoxLayout *deviceLayout = new QVBoxLayout();
+    deviceContainer->setLayout(deviceLayout);
+
+    view = new TableView(deviceContainer);
+    model = new TableModel(deviceContainer, deviceInfos);
     view->setModel(model);
     BoolDelegate *enabledDelegate = new BoolDelegate(view);
     view->setItemDelegateForColumn(1, enabledDelegate);
     OutputDelegate *outputDelegate = new OutputDelegate(view);
     view->setItemDelegateForColumn(5, outputDelegate);
-    stack->addWidget(view);
+    deviceLayout->addWidget(view);
+
+    axesView = new QTableView;
+    axesModel = new AxesModel(deviceContainer, deviceInfos);
+    axesView->setModel(axesModel);
+    deviceLayout->addWidget(axesView);
+    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesModel,
+            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+
+    stack->addWidget(deviceContainer);
 
     mainLayout->addWidget(stack);
     this->setLayout(mainLayout);
@@ -264,4 +277,129 @@ void OutputDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
     if (!box)
         return;
     model->setData(index, box->currentIndex());
+}
+
+AxesModel::AxesModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
+    deviceInfos(deviceInfosIn), infoIndex(-1)
+{
+    headerStrings.push_back("Device Axis");
+    headerStrings.push_back("Inverse");
+    headerStrings.push_back("Scale");
+    headerStrings.push_back("Output Axis");
+
+    axisLabels.push_back("Translation X");
+    axisLabels.push_back("Translation Y");
+    axisLabels.push_back("Translation Z");
+    axisLabels.push_back("Rotation X");
+    axisLabels.push_back("Rotation Y");
+    axisLabels.push_back("Rotation Z");
+}
+
+int AxesModel::rowCount(const QModelIndex &parent) const
+{
+    if (infoIndex == -1)
+        return 0;
+    return 6;
+}
+
+int AxesModel::columnCount(const QModelIndex &parent) const
+{
+    if (infoIndex == -1)
+        return 0;
+    return headerStrings.size();
+}
+
+QVariant AxesModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+    DeviceInfo temp = deviceInfos.at(infoIndex);
+    int column = index.column();
+    if (role == Qt::DisplayRole)
+    {
+        switch (column)
+        {
+        case 0:
+            return axisLabels.at(index.row());
+        case 1:
+            return temp.inverse.at(index.row());
+        case 2:
+            return temp.scale.at(index.row());
+        case 3:
+            return axisLabels.at(index.row());
+        }
+    }
+//    if (role == Qt::EditRole)
+//    {
+//        switch (column)
+//        {
+//        case 5: return static_cast<int>(deviceInfos.at(index.row()).output);
+//        }
+//    }
+    return QVariant();
+}
+
+QVariant AxesModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
+        return QVariant();
+    return headerStrings.at(section);
+}
+
+Qt::ItemFlags AxesModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    switch (index.column())
+    {
+    case 0:
+        return Qt::NoItemFlags;//device axis.
+    case 1:
+        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;//inverse
+    case 2:
+        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;//scale
+    case 3:
+        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled |//output axis
+                Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    }
+
+    return QAbstractTableModel::flags(index);
+}
+
+bool AxesModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!index.isValid() || role != Qt::EditRole)
+        return false;
+
+
+    //temp
+    return true;
+
+//    switch (index.column())
+//    {
+//    case 1:
+//        deviceInfos[index.row()].enabled = value.toBool();
+//        break;
+//    case 5:
+//        deviceInfos[index.row()].output = static_cast<OutputType::Output>(value.toInt());
+//        break;
+//    default:
+//        return false;
+//    }
+//    DeviceConfig::clearConfiguredDevices();
+//    DeviceConfig::writeConfiguredDevices(this->deviceInfos);
+
+//    emit dataChanged(index, index);
+//    return true;
+}
+
+void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
+{
+    qDebug() << "current row is: " << current.row();
+    if (current.row() == infoIndex)
+        return;
+    this->beginResetModel();
+    infoIndex = current.row();
+    this->endResetModel();
 }

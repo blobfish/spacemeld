@@ -38,6 +38,27 @@ private:
     DeviceInfos &deviceInfos;
 };
 
+class AxesModel : public QAbstractTableModel
+{
+    Q_OBJECT
+public:
+    explicit AxesModel(QObject *parent, DeviceInfos &deviceInfosIn);
+    int rowCount(const QModelIndex &parent) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+public slots:
+    void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
+
+private:
+    QStringList headerStrings;
+    DeviceInfos &deviceInfos;
+    int infoIndex;
+    QStringList axisLabels;
+};
+
 class Tab : public QWidget
 {
     Q_OBJECT
@@ -55,6 +76,8 @@ private:
 
     TableView *view;
     TableModel *model;
+    QTableView *axesView;
+    AxesModel *axesModel;
     QStackedWidget *stack;
     DeviceInfos deviceInfos;
 };
