@@ -49,7 +49,8 @@ void Tab::buildGui()
     progress->setMaximum(0);
     stack->addWidget(progressWidget);
 
-    QWidget *deviceContainer = new QWidget(stack);
+    QSplitter *deviceContainer = new QSplitter(stack);
+    deviceContainer->setOrientation(Qt::Vertical);
     QVBoxLayout *deviceLayout = new QVBoxLayout();
     deviceContainer->setLayout(deviceLayout);
 
@@ -396,7 +397,6 @@ bool AxesModel::setData(const QModelIndex &index, const QVariant &value, int rol
 
 void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
 {
-    qDebug() << "current row is: " << current.row();
     if (current.row() == infoIndex)
         return;
     this->beginResetModel();
