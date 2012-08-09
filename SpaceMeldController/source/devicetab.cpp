@@ -416,11 +416,6 @@ void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelInd
     this->endResetModel();
 }
 
-Qt::DropActions AxesModel::supportedDropActions() const
-{
-    return Qt::MoveAction;
-}
-
 void AxesView::openEditors()
 {
     this->openPersistentEditor(this->model()->index(0, 1));
