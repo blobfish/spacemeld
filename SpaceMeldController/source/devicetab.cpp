@@ -73,6 +73,8 @@ void Tab::buildGui()
     connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesModel,
             SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
     connect(axesModel, SIGNAL(modelReset()), axesView, SLOT(openEditors()));
+    ScaleDelegate *scaleDelegate = new ScaleDelegate(axesView);
+    axesView->setItemDelegateForColumn(2, scaleDelegate);
 
     stack->addWidget(deviceContainer);
 
@@ -382,9 +384,9 @@ bool AxesModel::setData(const QModelIndex &index, const QVariant &value, int rol
     case 1:
         deviceInfos[infoIndex].inverse[index.row()] = value.toInt();
         break;
-//    case 5:
-//        deviceInfos[index.row()].output = static_cast<OutputType::Output>(value.toInt());
-//        break;
+    case 2:
+        deviceInfos[infoIndex].scale[index.row()] = value.toDouble();
+        break;
     default:
         return false;
     }
@@ -402,6 +404,16 @@ void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelInd
     this->beginResetModel();
     infoIndex = current.row();
     this->endResetModel();
+}
+
+void AxesView::openEditors()
+{
+    this->openPersistentEditor(this->model()->index(0, 1));
+    this->openPersistentEditor(this->model()->index(1, 1));
+    this->openPersistentEditor(this->model()->index(2, 1));
+    this->openPersistentEditor(this->model()->index(3, 1));
+    this->openPersistentEditor(this->model()->index(4, 1));
+    this->openPersistentEditor(this->model()->index(5, 1));
 }
 
 QWidget* InverseDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -436,12 +448,41 @@ void InverseDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, c
         model->setData(index, 1);
 }
 
-void AxesView::openEditors()
+ScaleDelegate::ScaleDelegate(QWidget *parent) : QStyledItemDelegate(parent), lower(0.1), upper(10.0)
 {
-    this->openPersistentEditor(this->model()->index(0, 1));
-    this->openPersistentEditor(this->model()->index(1, 1));
-    this->openPersistentEditor(this->model()->index(2, 1));
-    this->openPersistentEditor(this->model()->index(3, 1));
-    this->openPersistentEditor(this->model()->index(4, 1));
-    this->openPersistentEditor(this->model()->index(5, 1));
+
+}
+
+QWidget* ScaleDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QLineEdit *edit = new QLineEdit(parent);
+    QDoubleValidator *validate = new QDoubleValidator(edit);
+    validate->setBottom(lower);
+    validate->setTop(upper);
+    validate->setDecimals(1);
+    edit->setValidator(validate);
+    return edit;
+}
+
+void ScaleDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return;
+    QLineEdit *edit = qobject_cast<QLineEdit*>(editor);
+    if (!edit)
+        return;
+    edit->setText(index.data().toString());
+}
+
+void ScaleDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return;
+    QLineEdit *edit = qobject_cast<QLineEdit*>(editor);
+    if (!edit)
+        return;
+    double temp = edit->text().toDouble();
+    if (temp < lower || temp > upper)
+        return;
+    model->setData(index, edit->text().toDouble());
 }
