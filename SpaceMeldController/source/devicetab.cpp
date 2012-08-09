@@ -58,6 +58,7 @@ void Tab::buildGui()
     view = new TableView(deviceContainer);
     model = new TableModel(deviceContainer, deviceInfos);
     view->setModel(model);
+    view->setSelectionMode(QAbstractItemView::SingleSelection);
     BoolDelegate *enabledDelegate = new BoolDelegate(view);
     view->setItemDelegateForColumn(1, enabledDelegate);
     OutputDelegate *outputDelegate = new OutputDelegate(view);
@@ -75,6 +76,11 @@ void Tab::buildGui()
     connect(axesModel, SIGNAL(modelReset()), axesView, SLOT(openEditors()));
     ScaleDelegate *scaleDelegate = new ScaleDelegate(axesView);
     axesView->setItemDelegateForColumn(2, scaleDelegate);
+//    axesView->setDragEnabled(true);
+    axesView->setSelectionMode(QAbstractItemView::SingleSelection);
+//    axesView->setDropIndicatorShown(true);
+//    axesView->setAcceptDrops(true);
+//    axesView->setDragDropMode(QAbstractItemView::InternalMove);
 
     stack->addWidget(deviceContainer);
 
@@ -336,13 +342,14 @@ QVariant AxesModel::data(const QModelIndex &index, int role) const
             return axisLabels.at(temp.axesMap.at(index.row()));
         }
     }
-//    if (role == Qt::EditRole)
-//    {
-//        switch (column)
-//        {
-//        case 5: return static_cast<int>(deviceInfos.at(index.row()).output);
-//        }
-//    }
+    if (role == Qt::EditRole)
+    {
+        switch (column)
+        {
+        case 3:
+            return deviceInfos.at(infoIndex).axesMap.at(index.row());
+        }
+    }
     return QVariant();
 }
 
@@ -367,7 +374,7 @@ Qt::ItemFlags AxesModel::flags(const QModelIndex &index) const
     case 2:
         return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;//scale
     case 3:
-        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled |//output axis
+        return Qt::ItemIsSelectable | Qt::ItemIsEnabled |//output axis
                 Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
     }
 
@@ -386,6 +393,9 @@ bool AxesModel::setData(const QModelIndex &index, const QVariant &value, int rol
         break;
     case 2:
         deviceInfos[infoIndex].scale[index.row()] = value.toDouble();
+        break;
+    case 3:
+        deviceInfos[infoIndex].axesMap[index.row()] = value.toInt();
         break;
     default:
         return false;
@@ -406,6 +416,11 @@ void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelInd
     this->endResetModel();
 }
 
+Qt::DropActions AxesModel::supportedDropActions() const
+{
+    return Qt::MoveAction;
+}
+
 void AxesView::openEditors()
 {
     this->openPersistentEditor(this->model()->index(0, 1));
@@ -414,6 +429,34 @@ void AxesView::openEditors()
     this->openPersistentEditor(this->model()->index(3, 1));
     this->openPersistentEditor(this->model()->index(4, 1));
     this->openPersistentEditor(this->model()->index(5, 1));
+}
+
+void AxesView::mousePressEvent(QMouseEvent *event)
+{
+    QModelIndex tempIndex = this->indexAt(event->pos());
+    if (tempIndex.column() == 3)
+        startDragIndex = tempIndex.row();
+    else
+        startDragIndex = -1;
+    QTableView::mousePressEvent(event);
+}
+
+void AxesView::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (startDragIndex != -1)
+    {
+        QModelIndex tempIndex = this->indexAt(event->pos());
+        if (tempIndex.column() == 3 && tempIndex.row() != startDragIndex)
+        {
+            //swap values
+            int first = this->model()->data(this->model()->index(startDragIndex, 3), Qt::EditRole).toInt();
+            int second = this->model()->data(this->model()->index(tempIndex.row(), 3), Qt::EditRole).toInt();
+            this->model()->setData(this->model()->index(startDragIndex, 3), second);
+            this->model()->setData(this->model()->index(tempIndex.row(), 3), first);
+        }
+        startDragIndex = -1;
+    }
+    QTableView::mouseReleaseEvent(event);
 }
 
 QWidget* InverseDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const

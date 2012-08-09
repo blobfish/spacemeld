@@ -49,6 +49,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
+    Qt::DropActions supportedDropActions() const;
 public slots:
     void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
 
@@ -63,9 +64,13 @@ class AxesView : public QTableView
 {
     Q_OBJECT
 public:
-    explicit AxesView(QWidget *parent = 0) : QTableView(parent){}
+    explicit AxesView(QWidget *parent = 0) : QTableView(parent), startDragIndex(-1){}
 public slots:
     void openEditors();
+protected:
+    int startDragIndex;
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
 };
 
 class Tab : public QWidget
