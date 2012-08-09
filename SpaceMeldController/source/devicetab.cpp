@@ -327,7 +327,7 @@ QVariant AxesModel::data(const QModelIndex &index, int role) const
         case 2:
             return temp.scale.at(index.row());
         case 3:
-            return axisLabels.at(index.row());
+            return axisLabels.at(temp.axesMap.at(index.row()));
         }
     }
 //    if (role == Qt::EditRole)
