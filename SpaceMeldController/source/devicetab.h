@@ -63,12 +63,16 @@ class AxesView : public QTableView
 {
     Q_OBJECT
 public:
-    explicit AxesView(QWidget *parent = 0) : QTableView(parent), startDragIndex(-1){}
+    explicit AxesView(QWidget *parent = 0);
 public slots:
     void openEditors();
 protected:
     int startDragIndex;
+    QPoint startPosition;
+    QPoint offset;
+    QLabel *dragLabel;
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
 };
 

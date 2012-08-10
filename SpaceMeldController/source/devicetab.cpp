@@ -416,6 +416,17 @@ void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelInd
     this->endResetModel();
 }
 
+AxesView::AxesView(QWidget *parent) : QTableView(parent), startDragIndex(-1)
+{
+    dragLabel = new QLabel(this);
+    dragLabel->setFrameStyle(QFrame::Panel);
+    QPalette palette = dragLabel->palette();
+    palette.setColor(dragLabel->backgroundRole(), Qt::yellow);
+    dragLabel->setPalette(palette);
+    dragLabel->setAutoFillBackground(true);
+    dragLabel->hide();
+}
+
 void AxesView::openEditors()
 {
     this->openPersistentEditor(this->model()->index(0, 1));
@@ -429,25 +440,59 @@ void AxesView::openEditors()
 void AxesView::mousePressEvent(QMouseEvent *event)
 {
     QModelIndex tempIndex = this->indexAt(event->pos());
-    if (tempIndex.column() == 3)
-        startDragIndex = tempIndex.row();
-    else
-        startDragIndex = -1;
+    if (tempIndex.isValid())
+    {
+        if (tempIndex.column() == 3)
+        {
+            dragLabel->resize(this->columnWidth(tempIndex.column()), this->rowHeight(tempIndex.row()));
+            int cornerX(0);
+            for (int index = 0; index < tempIndex.column(); ++index)
+                cornerX += this->columnWidth(index);
+            int cornerY(0);
+            for (int index = 0; index < tempIndex.row(); ++index)
+                cornerY += this->rowHeight(index);
+            startPosition = event->pos();
+            offset.rx() = startPosition.x() - cornerX;
+            offset.ry() = cornerY - startPosition.y();
+            startDragIndex = tempIndex.row();
+        }
+    }
     QTableView::mousePressEvent(event);
+}
+
+void AxesView::mouseMoveEvent(QMouseEvent *event)
+{
+    if (startDragIndex != -1)
+    {
+        QPoint temp = event->pos() - startPosition;
+        if (temp.manhattanLength() > 3 && dragLabel->isHidden())
+        {
+            QModelIndex tempIndex = this->indexAt(event->pos());
+            dragLabel->setText(this->model()->data(tempIndex).toString());
+            dragLabel->setVisible(true);
+        }
+        dragLabel->move(event->pos() - offset);
+    }
+    QTableView::mouseMoveEvent(event);
 }
 
 void AxesView::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (dragLabel->isVisible())
+        dragLabel->hide();
     if (startDragIndex != -1)
     {
         QModelIndex tempIndex = this->indexAt(event->pos());
-        if (tempIndex.column() == 3 && tempIndex.row() != startDragIndex)
+        if (tempIndex.isValid())
         {
-            //swap values
-            int first = this->model()->data(this->model()->index(startDragIndex, 3), Qt::EditRole).toInt();
-            int second = this->model()->data(this->model()->index(tempIndex.row(), 3), Qt::EditRole).toInt();
-            this->model()->setData(this->model()->index(startDragIndex, 3), second);
-            this->model()->setData(this->model()->index(tempIndex.row(), 3), first);
+            if (tempIndex.column() == 3 && tempIndex.row() != startDragIndex)
+            {
+                //swap values
+                int first = this->model()->data(this->model()->index(startDragIndex, 3), Qt::EditRole).toInt();
+                int second = this->model()->data(this->model()->index(tempIndex.row(), 3), Qt::EditRole).toInt();
+                this->model()->setData(this->model()->index(startDragIndex, 3), second);
+                this->model()->setData(this->model()->index(tempIndex.row(), 3), first);
+            }
         }
         startDragIndex = -1;
     }
