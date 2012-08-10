@@ -10,7 +10,6 @@ using namespace DeviceGui;
 Tab::Tab(QWidget *parent) :
     QWidget(parent)
 {
-    deviceInfos = DeviceConfig::readConfiguredDevices();
     buildGui();
     QtServiceController controller(SERVICE_NAME_STRING);
     if (controller.isRunning())
@@ -107,7 +106,9 @@ void Tab::driverStatus(bool signal)
         }
         else
         {
+            deviceInfos = DeviceConfig::readConfiguredDevices();
             stack->setCurrentIndex(2);
+            model->myReset();
         }
     }
     else
