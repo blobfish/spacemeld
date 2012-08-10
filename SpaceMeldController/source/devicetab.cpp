@@ -107,8 +107,9 @@ void Tab::driverStatus(bool signal)
         else
         {
             deviceInfos = DeviceConfig::readConfiguredDevices();
-            stack->setCurrentIndex(2);
+            view->selectionModel()->clear();
             model->myReset();
+            stack->setCurrentIndex(2);
         }
     }
     else
@@ -410,11 +411,21 @@ bool AxesModel::setData(const QModelIndex &index, const QVariant &value, int rol
 
 void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
 {
-    if (current.row() == infoIndex)
-        return;
-    this->beginResetModel();
-    infoIndex = current.row();
-    this->endResetModel();
+    if (current.isValid())
+    {
+        if (current.row() != infoIndex)
+        {
+            this->beginResetModel();
+            infoIndex = current.row();
+            this->endResetModel();
+        }
+    }
+    else
+    {
+        this->beginResetModel();
+        infoIndex = -1;
+        this->endResetModel();
+    }
 }
 
 AxesView::AxesView(QWidget *parent) : QTableView(parent), startDragIndex(-1)
