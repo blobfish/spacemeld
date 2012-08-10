@@ -75,11 +75,7 @@ void Tab::buildGui()
     connect(axesModel, SIGNAL(modelReset()), axesView, SLOT(openEditors()));
     ScaleDelegate *scaleDelegate = new ScaleDelegate(axesView);
     axesView->setItemDelegateForColumn(2, scaleDelegate);
-//    axesView->setDragEnabled(true);
     axesView->setSelectionMode(QAbstractItemView::SingleSelection);
-//    axesView->setDropIndicatorShown(true);
-//    axesView->setAcceptDrops(true);
-//    axesView->setDragDropMode(QAbstractItemView::InternalMove);
 
     stack->addWidget(deviceContainer);
 
