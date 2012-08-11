@@ -7,6 +7,7 @@ class QLabel;
 class QLineEdit;
 class QPushButton;
 class QButtonGroup;
+class QListWidget;
 
 namespace ServiceGui
 {
@@ -25,6 +26,8 @@ private slots:
     void goStartButton();
     void goStopButton();
     void goBrowse();
+    void goInterfaceButton(int id);
+    void goInterfaceItemChanged();
 
 private:
     bool isServiceInstalled();
@@ -44,6 +47,12 @@ private:
     QPushButton *startButton;
     QPushButton *stopButton;
     QButtonGroup *startGroup;
+
+    QPushButton *interfaceEnableButton;
+    QPushButton *interfaceDisableButton;
+    QButtonGroup *interfaceButtonGroup;
+    QListWidget *interfaceListWidget;
+    QString interfaceSelection;
 };
 }
 

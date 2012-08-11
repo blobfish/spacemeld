@@ -5,7 +5,6 @@
 #include "definitions.h"
 #include "servicetab.h"
 #include "devicetab.h"
-#include "interfacetab.h"
 
 #include <QDebug>
 
@@ -17,9 +16,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     ServiceGui::Tab *serviceTab = new ServiceGui::Tab(this);
     tab->addTab(serviceTab, "Service");
-
-    InterfaceGui::Tab *interfaceTab = new InterfaceGui::Tab(this);
-    tab->addTab(interfaceTab, "Interfaces");
 
     DeviceGui::Tab *deviceTab = new DeviceGui::Tab(this);
     tab->addTab(deviceTab, "Devices");

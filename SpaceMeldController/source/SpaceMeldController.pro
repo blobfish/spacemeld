@@ -15,7 +15,6 @@ SOURCES += main.cpp\
     mainwindow.cpp \
     servicetab.cpp \
     devicetab.cpp \
-    interfacetab.cpp \
     ../../SpaceMeldCommon/deviceconfig.cpp \
     ../../SpaceMeldCommon/deviceinfo.cpp \
     ../../SpaceMeldCommon/knowndevices.cpp \
@@ -23,7 +22,6 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h\
     servicetab.h \
     devicetab.h \
-    interfacetab.h \
     deviceconfig.h \
     deviceinfo.h \
     knowndevices.h
