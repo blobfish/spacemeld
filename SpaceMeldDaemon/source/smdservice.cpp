@@ -43,6 +43,8 @@ void SMDService::start()
     bool serialTest = settings.value(INTERFACE_STRING_SERIAL, false).toBool();
     if (serialTest)
     {
+        //not sure serial needs to be member variable and it doesn't look like
+        //I need the boolean in the constructor;
         serial = new InterfaceSerial(this->application(), true);
         detectedDevices += serial->getDevices();
     }
