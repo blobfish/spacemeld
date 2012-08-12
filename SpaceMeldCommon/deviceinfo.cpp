@@ -151,21 +151,22 @@ void dumpInfos (const DeviceInfos &infos)
                   "   Output: " << temp.output << endl <<
                   "   Max Displacement: " << temp.maxDisplacement << endl <<
                   "   Button Count: " << temp.buttonCount << endl <<
-                  "   Inverse:" << endl;
+                  "   Inverse:";
         for (int index(0); index < 6; ++index)
         {
-            stream << "      " << temp.inverse.at(index) << endl;
+            stream << "      " << temp.inverse.at(index);
         }
-        stream << "   Scale:" << endl;
+        stream << endl << "   Scale:";
         for (int index(0); index < 6; ++index)
         {
-            stream << "      " << temp.scale.at(index) << endl;
+            stream << "      " << temp.scale.at(index);
         }
-        stream << "   Axes Map:" << endl;
+        stream << endl << "   Axes Map:";
         for (int index(0); index < 6; ++index)
         {
-            stream << "      " << temp.axesMap.at(index) << endl;
+            stream << "      " << temp.axesMap.at(index);
         }
+        stream << endl << endl;
     }
     qDebug() << message;
 }
