@@ -115,6 +115,11 @@ void SMDService::resume()
 
 void SMDService::processCommand(int code)
 {
+    //there seems to be a lag in the receiving of these commands.
+    //has something to do with control focus in the controller app.
+    //this might be a cause of problems of controller settings getting
+    //out of sync with service.
+    qDebug() << "service received command: " << code;
 }
 
 DeviceInfos SMDService::reconcile(const DeviceInfos &configuredDeviceInfos)

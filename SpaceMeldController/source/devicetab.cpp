@@ -400,6 +400,9 @@ bool AxesModel::setData(const QModelIndex &index, const QVariant &value, int rol
     }
     DeviceConfig::clearConfiguredDevices();
     DeviceConfig::writeConfiguredDevices(this->deviceInfos);
+    QtServiceController controller(SERVICE_NAME_STRING);
+    if (!controller.sendCommand(100))
+        qDebug() << "send command failed";
 
     emit dataChanged(index, index);
     return true;
