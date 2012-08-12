@@ -12,6 +12,7 @@ DeviceInfo::DeviceInfo(QSettings &settings)
 {
     clear();
     modelId = static_cast<SpaceModelType::SpaceModel>(settings.value(DEVICE_ID_STRING, SpaceModelType::UNKNOWN).toInt());
+    runTimeId = settings.value(DEVICE_RUNTIMEID_STRING, -1).toInt();
     interfaceId = static_cast<ConnectionInterfaceType::ConnectionInterface>
             (settings.value(DEVICE_INTERFACE_ID_STRING, ConnectionInterfaceType::UNKNOWN).toInt());
     path = settings.value(DEVICE_PATH_STRING, "").toString();
@@ -45,6 +46,7 @@ DeviceInfo::DeviceInfo(QSettings &settings)
 void DeviceInfo::writeSettings(QSettings &settings) const
 {
     settings.setValue(DEVICE_ID_STRING, modelId);
+    settings.setValue(DEVICE_RUNTIMEID_STRING, runTimeId);
     settings.setValue(DEVICE_INTERFACE_ID_STRING, interfaceId);
     settings.setValue(DEVICE_PATH_STRING, path);
     settings.setValue(DEVICE_ENABLED_STRING, enabled);
@@ -76,6 +78,7 @@ void DeviceInfo::writeSettings(QSettings &settings) const
 void DeviceInfo::clear()
 {
     modelId = SpaceModelType::UNKNOWN;
+    runTimeId = -1;
     interfaceId = ConnectionInterfaceType::UNKNOWN;
     modelName.clear();
     versionString.clear();
@@ -136,6 +139,7 @@ void dumpInfos (const DeviceInfos &infos)
         DeviceInfo temp = (*it);
         stream << "   Model Name: " << temp.modelName << endl <<
                   "   Model Id: " << temp.modelId << endl <<
+                  "   Run Time Id: " << temp.runTimeId << endl <<
                   "   Interface Id: " << temp.interfaceId << endl <<
                   "   Version String: " << temp.versionString.replace('\r', "\n      ") << endl <<
                   "   Match Keys: " << endl;

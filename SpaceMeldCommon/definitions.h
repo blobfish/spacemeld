@@ -15,6 +15,7 @@
 
 #define DEVICES_STRING "Devices"
 #define DEVICE_ID_STRING "DeviceId"
+#define DEVICE_RUNTIMEID_STRING "DeviceRuntimeId"
 #define DEVICE_NAME_STRING "DeviceName"
 #define DEVICE_INTERFACE_ID_STRING "DeviceInterfaceId"
 #define DEVICE_PATH_STRING "DevicePath"

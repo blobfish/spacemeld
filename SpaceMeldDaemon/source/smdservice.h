@@ -19,9 +19,11 @@ protected:
     void pause();
     void resume();
     void processCommand(int code);
-    DeviceInfos reconcile(Devices &detectedDevices, const DeviceInfos &configuredDeviceInfos);
+    DeviceInfos reconcile(const DeviceInfos &configuredDeviceInfos);
 
     InterfaceSerial *serial;
+private:
+    Devices detectedDevices;
 };
 
 #endif // SMDSERVICE_H

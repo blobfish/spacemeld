@@ -45,6 +45,7 @@ public:
     void writeSettings(QSettings &settings) const;
 
     SpaceModelType::SpaceModel modelId;
+    int runTimeId;
     ConnectionInterfaceType::ConnectionInterface interfaceId;
     QString modelName;
     QString versionString;

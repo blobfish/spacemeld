@@ -35,12 +35,11 @@ void SMDService::start()
     logMessage("Space Meld starting");
     qDebug() << "Space Meld starting";
 
-    Devices detectedDevices;
-
     //config file on active interfaces.
     QSettings settings(QSettings::SystemScope, ORG_NAME_STRING, APP_NAME_STRING);
     settings.beginGroup(INTERFACE_STRING);
     bool serialTest = settings.value(INTERFACE_STRING_SERIAL, false).toBool();
+    settings.endGroup();
     if (serialTest)
     {
         //not sure serial needs to be member variable and it doesn't look like
@@ -48,13 +47,13 @@ void SMDService::start()
         serial = new InterfaceSerial(this->application(), true);
         detectedDevices += serial->getDevices();
     }
-    settings.endGroup();
 
     //usb interface
     //joystick interface
 
     DeviceInfos configuredDeviceInfos = DeviceConfig::readConfiguredDevices();
-    DeviceInfos reconciled = this->reconcile(detectedDevices, configuredDeviceInfos);
+    DeviceInfos reconciled = this->reconcile(configuredDeviceInfos);
+
     dumpInfos(reconciled);
     DeviceConfig::clearConfiguredDevices();
     DeviceConfig::writeConfiguredDevices(reconciled);
@@ -118,8 +117,9 @@ void SMDService::processCommand(int code)
 {
 }
 
-DeviceInfos SMDService::reconcile(Devices &detectedDevices, const DeviceInfos &configuredDeviceInfos)
+DeviceInfos SMDService::reconcile(const DeviceInfos &configuredDeviceInfos)
 {
+    int runTimeIndex(0);
     QList<DeviceInfo> copiedConfigure = configuredDeviceInfos.toList();
     DeviceInfos outputInfos;
     Devices::Iterator detectIt;
@@ -131,6 +131,7 @@ DeviceInfos SMDService::reconcile(Devices &detectedDevices, const DeviceInfos &c
         {
             if ((*configuredIt).isEqual((*detectIt)->info()))
             {
+                (*detectIt)->info().runTimeId = runTimeIndex++;
                 (*detectIt)->info().enabled = (*configuredIt).enabled;
                 (*detectIt)->info().output = (*configuredIt).output;
                 (*detectIt)->info().inverse = (*configuredIt).inverse;
@@ -148,6 +149,7 @@ DeviceInfos SMDService::reconcile(Devices &detectedDevices, const DeviceInfos &c
     QList<DeviceInfo>::Iterator configuredIt;
     for (configuredIt = copiedConfigure.begin(); configuredIt != copiedConfigure.end(); ++configuredIt)
     {
+        (*configuredIt).runTimeId = runTimeIndex++;
         (*configuredIt).detected = false;
         outputInfos.push_back(*configuredIt);
     }
