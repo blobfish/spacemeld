@@ -54,6 +54,7 @@ public slots:
     void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
 
 private:
+    void sendCommand(int command);
     QStringList headerStrings;
     DeviceInfos &deviceInfos;
     int infoIndex;

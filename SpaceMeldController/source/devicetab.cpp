@@ -400,12 +400,34 @@ bool AxesModel::setData(const QModelIndex &index, const QVariant &value, int rol
     }
     DeviceConfig::clearConfiguredDevices();
     DeviceConfig::writeConfiguredDevices(this->deviceInfos);
-    QtServiceController controller(SERVICE_NAME_STRING);
-    if (!controller.sendCommand(100))
-        qDebug() << "send command failed";
+
+    //the dragging of column 3 (axis map) makes 2 calls to this set data function.
+    //the following complication is to send the command for only one call.
+    //ignore the first, send on the second.
+    if (index.column() == 3)
+    {
+        static bool signal = false; //false represents first call (ignore).
+        if (signal)
+        {
+            sendCommand(100 + deviceInfos[infoIndex].runTimeId);
+            signal = false;
+        }
+        else
+            signal = true;
+    }
+    else
+        sendCommand(100 + deviceInfos[infoIndex].runTimeId);
+
 
     emit dataChanged(index, index);
     return true;
+}
+
+void AxesModel::sendCommand(int command)
+{
+    QtServiceController controller(SERVICE_NAME_STRING);
+    if (!controller.sendCommand(command))
+        qDebug() << "send command failed";
 }
 
 void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
