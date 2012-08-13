@@ -19,10 +19,11 @@ protected:
     void pause();
     void resume();
     void processCommand(int code);
+
+private:
     DeviceInfos reconcile(const DeviceInfos &configuredDeviceInfos);
 
     InterfaceSerial *serial;
-private:
     Devices detectedDevices;
 };
 
