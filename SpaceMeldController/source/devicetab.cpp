@@ -602,3 +602,8 @@ void ScaleDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, con
         return;
     model->setData(index, edit->text().toDouble());
 }
+
+QString ScaleDelegate::displayText(const QVariant &value, const QLocale &locale) const
+{
+    return locale.toString(value.toFloat(), 'f', 1);
+}
