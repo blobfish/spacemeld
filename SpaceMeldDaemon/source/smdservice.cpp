@@ -82,7 +82,7 @@ void SMDService::start()
                 }
             }
             else
-                qDebug() << (*deviceIt)->info().modelName << " launch FAILED";
+                qDebug() << currentDevice->info().modelName << " launch FAILED";
         }
     }
 
