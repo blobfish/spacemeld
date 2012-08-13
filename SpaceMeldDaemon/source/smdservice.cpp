@@ -61,17 +61,16 @@ void SMDService::start()
     Devices::const_iterator deviceIt;
     for (deviceIt = detectedDevices.begin(); deviceIt != detectedDevices.end(); ++deviceIt)
     {
-        if (((*deviceIt)->info().enabled) && ((*deviceIt)->info().detected))
+        DeviceBase *currentDevice = (*deviceIt);
+        if ((currentDevice->info().enabled) && (currentDevice->info().detected))
         {
-            if ((*deviceIt)->launch())
+            if (currentDevice->launch())
             {
-                qDebug() << (*deviceIt)->info().modelName << " is ready";
-                if ((*deviceIt)->info().output == OutputType::X11)
+                qDebug() << currentDevice->info().modelName << " is ready";
+                if (currentDevice->info().output == OutputType::X11)
                 {
                     ExportX11 *x11 = ExportX11::instance();
                     x11->initialize();
-
-                    DeviceBase *currentDevice = (*deviceIt);
 
                     AxesMutator *mutate = new AxesMutator(x11);
                     mutate->invertAxes(AxesMutator::ALL, true);
