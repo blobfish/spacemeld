@@ -25,7 +25,7 @@ inline const char* getString(ConnectionInterfaceType::ConnectionInterface index)
 
 namespace OutputType
 {
-enum Output {UNKNOWN, X11, DBUS};
+enum Output {UNKNOWN, X11, DBUS, WIN, MAC};
 inline int size(){return 3;}
 inline const char* getString(OutputType::Output index)
 {
