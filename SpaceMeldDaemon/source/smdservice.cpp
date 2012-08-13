@@ -71,7 +71,7 @@ void SMDService::start()
                 {
                     ExportX11 *x11 = ExportX11::instance();
 
-                    AxesMutator *mutate = new AxesMutator(x11);
+                    AxesMutator *mutate = new AxesMutator(currentDevice);
                     mutate->invertAxes(AxesMutator::ALL, true);
                     mutate->setSensitivity(AxesMutator::ALL, 6.0);
                     QObject::connect(currentDevice, SIGNAL(displacementOut(QVector<qint16>)), mutate, SLOT(displacementIn(QVector<qint16>)));
