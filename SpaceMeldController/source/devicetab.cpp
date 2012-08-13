@@ -23,8 +23,6 @@ Tab::Tab(QWidget *parent) :
 
 void Tab::buildGui()
 {
-    this->setToolTip("The device tab sets options for devices.\n Modifications here "
-                        "will require a driver restart to take effect.");
     stack = new QStackedWidget(this);
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
@@ -55,6 +53,14 @@ void Tab::buildGui()
     deviceContainer->setLayout(deviceLayout);
 
     view = new TableView(deviceContainer);
+    view->setToolTip(tr("Device list:\n"
+                        "   enabled to false causes service to ignore the device.\n"
+                        "   output setting alters service to application communication.\n"
+                        "       X11: for unix/linux proprietary, legacy compatibility.\n"
+                        "       Win: for windows proprietary, legacy compatibility.\n"
+                        "       Mac: for macosx proprietary, legacy compatibility.\n"
+                        "       DBUS: for dbus compatibility. (new development).\n"
+                        "   Changes to enabled or output, will require a service restart."));
     model = new TableModel(deviceContainer, deviceInfos);
     view->setModel(model);
     view->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -65,6 +71,11 @@ void Tab::buildGui()
     deviceLayout->addWidget(view);
 
     axesView = new AxesView;
+    axesView->setToolTip(tr("Axes Parameters:\n"
+                            "   Check inverse to reverse axis direction.\n"
+                            "   Set scale number for sensitivity. .1 to 10.0\n"
+                            "   Drag and drop output axes to change device axes mapping.\n"
+                            "   Changes here should take affect immediately and not require a service restart."));
     axesModel = new AxesModel(deviceContainer, deviceInfos);
     axesView->setModel(axesModel);
     InverseDelegate *inverseDelegate = new InverseDelegate(axesView);
