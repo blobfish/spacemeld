@@ -70,7 +70,6 @@ void SMDService::start()
                 if (currentDevice->info().output == OutputType::X11)
                 {
                     ExportX11 *x11 = ExportX11::instance();
-                    x11->initialize();
 
                     AxesMutator *mutate = new AxesMutator(x11);
                     mutate->invertAxes(AxesMutator::ALL, true);

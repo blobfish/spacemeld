@@ -32,6 +32,8 @@ private:
     explicit ExportX11(QObject *parent = 0);
     void finish();
 
+    bool initializedTest;
+
     Display *display;
     Window xWindow;
     Atom xEventMotion;

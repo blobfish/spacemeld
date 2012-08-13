@@ -9,7 +9,7 @@
 
 
 ExportX11::ExportX11(QObject *parent) :
-    ExportBase(parent)
+    ExportBase(parent), initializedTest(false)
 {
     display = 0;
     xWindow = 0;
@@ -23,6 +23,8 @@ ExportX11::~ExportX11()
 ExportX11* ExportX11::instance()
 {
     static ExportX11 *pointer = new ExportX11(QCoreApplication::instance());
+    if (!pointer->initializedTest)
+        pointer->initialize();
     return pointer;
 }
 
@@ -59,6 +61,7 @@ bool ExportX11::initialize()
     QObject::connect(xTimer, SIGNAL(timeout()), this, SLOT(xEventsIn()));
     xTimer->start();
 
+    initializedTest = true;
     return true;
 }
 
