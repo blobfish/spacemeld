@@ -87,6 +87,8 @@ void Tab::buildGui()
     connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesView,
             SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
     connect(axesModel, SIGNAL(modelReset()), axesView, SLOT(openEditors()));
+    connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), axesView,
+            SLOT(outputChangedSlot(QModelIndex,QModelIndex)));
     ScaleDelegate *scaleDelegate = new ScaleDelegate(axesView);
     axesView->setItemDelegateForColumn(2, scaleDelegate);
     axesView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -553,6 +555,20 @@ void AxesView::selectionChangedSlot(const QModelIndex &current, const QModelInde
     }
     else
         this->hide();
+}
+
+void AxesView::outputChangedSlot(const QModelIndex & topLeft, const QModelIndex & bottomRight)
+{
+    if (topLeft.column() != 5)
+    {
+        this->show();
+        return;
+    }
+    OutputType::Output tempOutput = static_cast<OutputType::Output>(topLeft.data(Qt::EditRole).toInt());
+    if (tempOutput == OutputType::DBUS)
+        this->hide();
+    else
+        this->show();
 }
 
 QWidget* InverseDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const

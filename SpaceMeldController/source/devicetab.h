@@ -69,6 +69,7 @@ public:
 public slots:
     void openEditors();
     void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
+    void outputChangedSlot(const QModelIndex & topLeft, const QModelIndex & bottomRight);
 protected:
     int startDragIndex;
     QPoint startPosition;
