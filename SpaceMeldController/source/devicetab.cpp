@@ -70,7 +70,7 @@ void Tab::buildGui()
     view->setItemDelegateForColumn(5, outputDelegate);
     deviceLayout->addWidget(view);
 
-    axesView = new AxesView;
+    axesView = new AxesView(deviceContainer);
     axesView->setToolTip(tr("Axes Parameters:\n"
                             "   Check inverse to reverse axis direction.\n"
                             "   Set scale number for sensitivity. .1 to 10.0\n"
