@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector>
+#include "deviceinfo.h"
 
 class AxesMutator : public QObject
 {
@@ -13,6 +14,7 @@ public:
     void invertAxes(Axis axis, bool signal);
     void setMap(const QVector<int> &mapIn);
     void setSensitivity(Axis axis, float scale);
+    void setConfig(const DeviceInfo &info);
     
 signals:
     void displacementOut(QVector<qint16> values);

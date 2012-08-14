@@ -72,8 +72,8 @@ void SMDService::start()
                     ExportX11 *x11 = ExportX11::instance();
 
                     AxesMutator *mutate = new AxesMutator(currentDevice);
-                    mutate->invertAxes(AxesMutator::ALL, true);
-                    mutate->setSensitivity(AxesMutator::ALL, 6.0);
+                    mutate->setObjectName("axesMutator");
+                    mutate->setConfig(currentDevice->info());
                     QObject::connect(currentDevice, SIGNAL(displacementOut(QVector<qint16>)), mutate, SLOT(displacementIn(QVector<qint16>)));
 
                     QObject::connect(mutate, SIGNAL(displacementOut(QVector<qint16>)), x11, SLOT(displacementIn(QVector<qint16>)));
@@ -117,7 +117,10 @@ void SMDService::processCommand(int code)
     //has something to do with control focus in the controller app.
     //this might be a cause of problems of controller settings getting
     //out of sync with service.
-    qDebug() << "service received command: " << code;
+
+    if (code > 99)
+        loadAxesMutate(code);
+
 }
 
 DeviceInfos SMDService::reconcile(const DeviceInfos &configuredDeviceInfos)
@@ -158,4 +161,47 @@ DeviceInfos SMDService::reconcile(const DeviceInfos &configuredDeviceInfos)
     }
 
     return outputInfos;
+}
+
+DeviceBase* SMDService::findById(const int &findId)
+{
+    Devices::Iterator detectIt;
+    for (detectIt = detectedDevices.begin(); detectIt != detectedDevices.end(); ++detectIt)
+    {
+        if (findId == (*detectIt)->info().runTimeId)
+            return (*detectIt);
+    }
+    return 0;
+}
+
+void SMDService::loadAxesMutate(int deviceId)
+{
+    deviceId -= 100;
+    DeviceBase *device = findById(deviceId);
+    if (!device)
+    {
+        qDebug() << "couldn't find run time id in SMDService::loadAxesMutate for id: " << deviceId;
+        return;
+    }
+
+    if ((!device->info().detected) || device->info().output == OutputType::DBUS)
+        return;
+
+    AxesMutator *mutate = device->findChild<AxesMutator *>("axesMutator");
+    if (!mutate)
+    {
+        qDebug() << "couldn't find mutator in SMDService::loadAxesMutate";
+        return;
+    }
+
+    DeviceInfos infos = DeviceConfig::readConfiguredDevices();
+    DeviceInfos::Iterator it;
+    for (it = infos.begin(); it != infos.end(); ++it)
+    {
+        if ((*it).runTimeId == device->info().runTimeId)
+        {
+            mutate->setConfig(*it);
+            break;
+        }
+    }
 }

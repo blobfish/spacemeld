@@ -22,6 +22,8 @@ protected:
 
 private:
     DeviceInfos reconcile(const DeviceInfos &configuredDeviceInfos);
+    DeviceBase* findById(const int &findId);
+    void loadAxesMutate(int deviceId);
 
     InterfaceSerial *serial;
     Devices detectedDevices;

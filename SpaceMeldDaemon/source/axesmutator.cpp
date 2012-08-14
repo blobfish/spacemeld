@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "axesmutator.h"
 
 AxesMutator::AxesMutator(QObject *parent) :
@@ -39,10 +40,10 @@ void AxesMutator::displacementIn(QVector<qint16> values)
 
     QVector<qint16> valuesOut;
     valuesOut.reserve(6);
+    valuesOut.resize(6);
 
-    for (int index(0); index < values.size(); ++index)
-        valuesOut.insert(axesMap.at(index), static_cast<qint16>
-                         (values.at(index) * inverse.at(index) * sensitivity.at(index)));
+    for (int index(0); index < 6; ++index)
+        valuesOut[axesMap.at(index)] = static_cast<qint16> (values.at(index) * inverse.at(index) * sensitivity.at(index));
 
     emit displacementOut(valuesOut);
 }
@@ -78,5 +79,12 @@ void AxesMutator::setSensitivity(AxesMutator::Axis axis, float scale)
     }
 
     sensitivity.replace(axis, scale);
+}
+
+void AxesMutator::setConfig(const DeviceInfo &info)
+{
+    this->inverse = info.inverse;
+    this->sensitivity = info.scale;
+    this->axesMap = info.axesMap;
 }
 
