@@ -75,7 +75,8 @@ void Tab::buildGui()
                             "   Check inverse to reverse axis direction.\n"
                             "   Set scale number for sensitivity. .1 to 10.0\n"
                             "   Drag and drop output axes to change device axes mapping.\n"
-                            "   Changes here should take affect immediately and not require a service restart."));
+                            "   Changes here should take affect immediately and not require a service restart.\n"
+                            "      Assuming the relevant device was detected and enabled upon service start."));
     axesModel = new AxesModel(deviceContainer, deviceInfos);
     axesView->setModel(axesModel);
     axesView->hide();
