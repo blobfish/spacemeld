@@ -79,7 +79,6 @@ void Tab::buildGui()
                             "      Assuming the relevant device was detected and enabled upon service start."));
     axesModel = new AxesModel(deviceContainer, deviceInfos);
     axesView->setModel(axesModel);
-    axesView->hide();
     InverseDelegate *inverseDelegate = new InverseDelegate(axesView);
     axesView->setItemDelegateForColumn(1, inverseDelegate);
     deviceLayout->addWidget(axesView);
