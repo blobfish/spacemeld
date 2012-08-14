@@ -78,10 +78,13 @@ void Tab::buildGui()
                             "   Changes here should take affect immediately and not require a service restart."));
     axesModel = new AxesModel(deviceContainer, deviceInfos);
     axesView->setModel(axesModel);
+    axesView->hide();
     InverseDelegate *inverseDelegate = new InverseDelegate(axesView);
     axesView->setItemDelegateForColumn(1, inverseDelegate);
     deviceLayout->addWidget(axesView);
     connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesModel,
+            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesView,
             SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
     connect(axesModel, SIGNAL(modelReset()), axesView, SLOT(openEditors()));
     ScaleDelegate *scaleDelegate = new ScaleDelegate(axesView);
@@ -445,22 +448,7 @@ void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelInd
 {
     this->beginResetModel();
     if (current.isValid())
-    {
-        if (current.row() != infoIndex)
-        {
-            QModelIndex sibling = current.sibling(current.row(), 5);
-            if (sibling.isValid())
-            {
-                OutputType::Output output = static_cast<OutputType::Output>(sibling.data(Qt::EditRole).toInt());
-                if (output == OutputType::DBUS)
-                    infoIndex = -1;
-                else
-                    infoIndex = current.row();
-            }
-            else
-                infoIndex = current.row();
-        }
-    }
+        infoIndex = current.row();
     else
         infoIndex = -1;
     this->endResetModel();
@@ -547,6 +535,24 @@ void AxesView::mouseReleaseEvent(QMouseEvent *event)
         startDragIndex = -1;
     }
     QTableView::mouseReleaseEvent(event);
+}
+
+void AxesView::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
+{
+    if (current.isValid())
+    {
+        QModelIndex sibling = current.sibling(current.row(), 5);
+        if (sibling.isValid())
+        {
+            OutputType::Output output = static_cast<OutputType::Output>(sibling.data(Qt::EditRole).toInt());
+            if (output == OutputType::DBUS)
+                this->hide();
+            else
+                this->show();
+        }
+    }
+    else
+        this->hide();
 }
 
 QWidget* InverseDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const

@@ -68,6 +68,7 @@ public:
     explicit AxesView(QWidget *parent = 0);
 public slots:
     void openEditors();
+    void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
 protected:
     int startDragIndex;
     QPoint startPosition;
