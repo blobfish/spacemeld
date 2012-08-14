@@ -443,21 +443,27 @@ void AxesModel::sendCommand(int command)
 
 void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
 {
+    this->beginResetModel();
     if (current.isValid())
     {
         if (current.row() != infoIndex)
         {
-            this->beginResetModel();
-            infoIndex = current.row();
-            this->endResetModel();
+            QModelIndex sibling = current.sibling(current.row(), 5);
+            if (sibling.isValid())
+            {
+                OutputType::Output output = static_cast<OutputType::Output>(sibling.data(Qt::EditRole).toInt());
+                if (output == OutputType::DBUS)
+                    infoIndex = -1;
+                else
+                    infoIndex = current.row();
+            }
+            else
+                infoIndex = current.row();
         }
     }
     else
-    {
-        this->beginResetModel();
         infoIndex = -1;
-        this->endResetModel();
-    }
+    this->endResetModel();
 }
 
 AxesView::AxesView(QWidget *parent) : QTableView(parent), startDragIndex(-1)
