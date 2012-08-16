@@ -6,6 +6,7 @@
 #if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
 
 #include "exportx11.h"
+#include <X11/keysym.h>
 
 
 ExportX11::ExportX11(QObject *parent) :
@@ -151,6 +152,11 @@ void ExportX11::buttonIn(qint8 buttonNumber, bool buttonDown)
         XSendEvent(display, *it, False, 0, &event);
     }
     XFlush(display);
+}
+
+void ExportX11::setButtonMap(const DeviceInfo &info)
+{
+    buttonKeyMap = info.buttonKeyMap;
 }
 
 #endif

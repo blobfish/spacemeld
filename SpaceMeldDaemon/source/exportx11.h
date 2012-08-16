@@ -17,6 +17,7 @@ class ExportX11 : public ExportBase
 public:
     ~ExportX11();
     virtual bool initialize();
+    void setButtonMap(const DeviceInfo &info);
     static int xError(Display *aDisplay, XErrorEvent *anError);
     static int xInputOutputError(Display *aDisplay);
     static ExportX11 *instance();
@@ -42,6 +43,7 @@ private:
     Atom xEventCommand;
 
     QVector<Window> clients;
+    QMap<int, QString> buttonKeyMap;
 };
 
 #endif //Q_WS_X11
