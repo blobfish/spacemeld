@@ -135,23 +135,81 @@ void ExportX11::displacementIn(QVector<qint16> values)
 
 void ExportX11::buttonIn(qint8 buttonNumber, bool buttonDown)
 {
-//    qDebug() << "Button: " << buttonNumber << ((buttonDown) ? " pressed" : " released");
+    if (buttonKeyMap.contains(buttonNumber))
+    {
+        if (!buttonKeyMap.value(buttonNumber).isEmpty())
+        {
+            sendKeyMessage(buttonNumber, buttonDown);
+            return;
+        }
+    }
+    sendButtonMessage(buttonNumber, buttonDown);
+}
 
-    XEvent event;
-    event.type = ClientMessage;
-    event.xclient.display = display;
-    event.xclient.send_event = False;
-    event.xclient.message_type = (buttonDown) ? xEventButtonPress : xEventButtonRelease;
-    event.xclient.format = 16;
-    event.xclient.data.s[2] = static_cast<qint16>(buttonNumber);
+void ExportX11::sendKeyMessage(qint8 buttonNumber, bool buttonDown)
+{
+    //only send on button down.
+    if (!buttonDown)
+        return;
+    //note on X meta and alt appear to be the same.
+    //run xmodmap on terminal to discover.
+    QString string = buttonKeyMap.value(buttonNumber);
+    quint32 modState(0);
+    if (string.contains("Ctrl"))
+        modState |= ControlMask;
+    if (string.contains("Shift"))
+        modState |= ShiftMask;
+    if (string.contains("Alt") || string.contains("Meta"))
+        modState |= Mod1Mask;
+
+    string.remove("Alt");
+    string.remove("Shift");
+    string.remove("Ctrl");
+    string.remove("Meta");
+    string.remove("+");
+
+    if (string.size() != 1)
+    {
+        qDebug() << "string size is not 1 in ExportX11::sendKeyMessage";
+        return;
+    }
+
+    int inputKey = static_cast<int>(string.at(0).toAscii());
+
+    XKeyEvent event;
+    event.type = KeyPress;
+    event.display = display;
+    event.same_screen = True;
+    event.keycode = XKeysymToKeycode(display, inputKey);
+    event.state = modState;
 
     QVector<Window>::iterator it;
     for (it = clients.begin(); it != clients.end(); ++it)
     {
-        event.xclient.window = *it;
-        XSendEvent(display, *it, False, 0, &event);
+        XSendEvent(display, *it, True, KeyPressMask, (XEvent*)(&event));
     }
     XFlush(display);
+}
+
+void ExportX11::sendButtonMessage(qint8 buttonNumber, bool buttonDown)
+{
+    //    qDebug() << "Button: " << buttonNumber << ((buttonDown) ? " pressed" : " released");
+
+        XEvent event;
+        event.type = ClientMessage;
+        event.xclient.display = display;
+        event.xclient.send_event = False;
+        event.xclient.message_type = (buttonDown) ? xEventButtonPress : xEventButtonRelease;
+        event.xclient.format = 16;
+        event.xclient.data.s[2] = static_cast<qint16>(buttonNumber);
+
+        QVector<Window>::iterator it;
+        for (it = clients.begin(); it != clients.end(); ++it)
+        {
+            event.xclient.window = *it;
+            XSendEvent(display, *it, False, 0, &event);
+        }
+        XFlush(display);
 }
 
 void ExportX11::setButtonMap(const DeviceInfo &info)

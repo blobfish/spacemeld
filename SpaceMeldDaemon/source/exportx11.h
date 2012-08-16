@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QVector>
 #include <exportbase.h>
+#include <deviceinfo.h>
 
 #if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
 #include <X11/Xlib.h>
@@ -32,6 +33,8 @@ private slots:
 private:
     explicit ExportX11(QObject *parent = 0);
     void finish();
+    void sendButtonMessage(qint8 buttonNumber, bool buttonDown);
+    void sendKeyMessage(qint8 buttonNumber, bool buttonDown);
 
     bool initializedTest;
 

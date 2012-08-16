@@ -76,7 +76,7 @@ void SMDService::start()
                     mutate->setObjectName("axesMutator");
                     mutate->setConfig(currentDevice->info());
                     QObject::connect(currentDevice, SIGNAL(displacementOut(QVector<qint16>)), mutate, SLOT(displacementIn(QVector<qint16>)));
-                    x11->setButtonMap(current->info());
+                    x11->setButtonMap(currentDevice->info());
 
                     QObject::connect(mutate, SIGNAL(displacementOut(QVector<qint16>)), x11, SLOT(displacementIn(QVector<qint16>)));
                     QObject::connect(currentDevice, SIGNAL(buttonOut(qint8, bool)), x11, SLOT(buttonIn(qint8, bool)));
