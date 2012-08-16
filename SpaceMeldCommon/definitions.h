@@ -28,4 +28,8 @@
 #define AXES_SCALE_STRING "AxesScale"
 #define AXES_MAP_STRING "AxesMap"
 
+#define BUTTON_KEY_MAP_STRING "ButtonKeyMap"
+#define BUTTON_STRING "Button"
+#define KEY_STRING "Key"
+
 #endif //DEFINITIONS_H

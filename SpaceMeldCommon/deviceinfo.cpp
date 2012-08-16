@@ -41,6 +41,16 @@ DeviceInfo::DeviceInfo(QSettings &settings)
         axesMap[index] = settings.value(QString("%1").arg(index), index).toInt();
     }
     settings.endArray();
+    size = settings.beginReadArray(BUTTON_KEY_MAP_STRING);
+    for (int index(0); index < size; ++index)
+    {
+        settings.setArrayIndex(index);
+        int button = settings.value(BUTTON_STRING, -1).toInt();
+        QString temp = settings.value(KEY_STRING).toString();
+        if (button != -1 && !temp.isEmpty())
+            buttonKeyMap.insert(button, temp);
+    }
+    settings.endArray();
 }
 
 void DeviceInfo::writeSettings(QSettings &settings) const
@@ -71,6 +81,19 @@ void DeviceInfo::writeSettings(QSettings &settings) const
     {
         settings.setArrayIndex(index);
         settings.setValue(QString("%1").arg(index), axesMap.at(index));
+    }
+    settings.endArray();
+    settings.beginWriteArray(BUTTON_KEY_MAP_STRING);
+    QMap<int, QString>::const_iterator buttonIt;
+    int count(0);
+    for (buttonIt = buttonKeyMap.constBegin(); buttonIt != buttonKeyMap.constEnd(); buttonIt++)
+    {
+        if (buttonIt.value().isEmpty())
+            continue;
+        settings.setArrayIndex(count);
+        settings.setValue(BUTTON_STRING, buttonIt.key());
+        settings.setValue(KEY_STRING, buttonIt.value());
+        count++;
     }
     settings.endArray();
 }
@@ -116,6 +139,8 @@ void DeviceInfo::clear()
     scale.push_back(1.0);
     scale.push_back(1.0);
     scale.push_back(1.0);
+
+    buttonKeyMap.clear();
 }
 
 bool DeviceInfo::isEqual(const DeviceInfo &other) const
@@ -165,6 +190,13 @@ void dumpInfos (const DeviceInfos &infos)
         for (int index(0); index < 6; ++index)
         {
             stream << "      " << temp.axesMap.at(index);
+        }
+        stream << endl << "   Button Map:" << endl;
+        QMap<int, QString>::const_iterator buttonIt;
+        for (buttonIt = temp.buttonKeyMap.constBegin(); buttonIt != temp.buttonKeyMap.constEnd(); buttonIt++)
+        {
+            stream << "      Button: " << buttonIt.key() << "   "
+                   << buttonIt.value();
         }
         stream << endl << endl;
     }

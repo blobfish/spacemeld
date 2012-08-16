@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QMap>
 
 class QSettings;
 
@@ -59,6 +60,7 @@ public:
     QVector<int> inverse;
     QVector<float> scale;
     QVector<int> axesMap;
+    QMap<int, QString> buttonKeyMap;
 };
 
 typedef QVector<DeviceInfo> DeviceInfos;

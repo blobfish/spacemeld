@@ -5,12 +5,14 @@
 #include <QTableView>
 #include <QAbstractTableModel>
 #include <QStyledItemDelegate>
+#include <QLineEdit>
 #include "deviceinfo.h"
 #include "deviceconfig.h"
 
 class QLabel;
 class QStackedWidget;
 class QProgressBar;
+class QSplitter;
 
 namespace DeviceGui
 {
@@ -68,7 +70,6 @@ public:
     explicit AxesView(QWidget *parent = 0);
 public slots:
     void openEditors();
-    void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
     void outputChangedSlot(const QModelIndex & topLeft, const QModelIndex & bottomRight);
 protected:
     int startDragIndex;
@@ -78,6 +79,34 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
+};
+
+class ButtonMapModel : public QAbstractTableModel
+{
+    Q_OBJECT
+public:
+    explicit ButtonMapModel(QObject *parent, DeviceInfos &deviceInfosIn);
+    int rowCount(const QModelIndex &parent) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+public slots:
+    void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
+
+private:
+    QStringList headerStrings;
+    DeviceInfos &deviceInfos;
+    int infoIndex;
+};
+
+class ButtonMapView : public QTableView
+{
+    Q_OBJECT
+public:
+    explicit ButtonMapView(QWidget *parent = 0);
+protected:
 };
 
 class Tab : public QWidget
@@ -91,6 +120,7 @@ public slots:
 
 private slots:
     void driverStatusHelper();
+    void selectionUpdate(const QModelIndex &current, const QModelIndex &previous);
 
 private:
     void buildGui();
@@ -99,8 +129,11 @@ private:
     TableModel *model;
     QTableView *axesView;
     AxesModel *axesModel;
+    ButtonMapModel *buttonMapModel;
+    ButtonMapView *buttonMapView;
     QStackedWidget *stack;
     DeviceInfos deviceInfos;
+    QSplitter *subSplitter;
 };
 
 class BoolDelegate : public QStyledItemDelegate
@@ -146,6 +179,26 @@ public:
 private:
     double lower;
     double upper;
+};
+
+class KeyDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    KeyDelegate(QWidget *parent = 0);
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+    QString displayText(const QVariant &value, const QLocale &locale) const;
+};
+
+class KeyDelegateEditLine : public QLineEdit
+{
+    Q_OBJECT
+public:
+    KeyDelegateEditLine(QWidget *parent = 0);
+protected:
+    virtual void keyPressEvent(QKeyEvent *event);
 };
 }
 

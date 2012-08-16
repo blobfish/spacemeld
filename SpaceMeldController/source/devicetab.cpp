@@ -1,6 +1,7 @@
 #include <QtGui/QtGui>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QKeySequence>
 #include "qtservice.h"
 #include "definitions.h"
 #include "devicetab.h"
@@ -47,12 +48,10 @@ void Tab::buildGui()
     progress->setMaximum(0);
     stack->addWidget(progressWidget);
 
-    QSplitter *deviceContainer = new QSplitter(stack);
-    deviceContainer->setOrientation(Qt::Vertical);
-    QVBoxLayout *deviceLayout = new QVBoxLayout();
-    deviceContainer->setLayout(deviceLayout);
+    QSplitter *mainSplitter = new QSplitter(stack);
+    mainSplitter->setOrientation(Qt::Vertical);
 
-    view = new TableView(deviceContainer);
+    view = new TableView(mainSplitter);
     view->setToolTip(tr("Device list:\n"
                         "   enabled to false causes service to ignore the device.\n"
                         "   output setting alters service to application communication.\n"
@@ -61,31 +60,34 @@ void Tab::buildGui()
                         "       Mac: for macosx proprietary, legacy compatibility.\n"
                         "       DBUS: for dbus compatibility. (new development).\n"
                         "   Changes to enabled or output, will require a service restart."));
-    model = new TableModel(deviceContainer, deviceInfos);
+    model = new TableModel(mainSplitter, deviceInfos);
     view->setModel(model);
     view->setSelectionMode(QAbstractItemView::SingleSelection);
     BoolDelegate *enabledDelegate = new BoolDelegate(view);
     view->setItemDelegateForColumn(1, enabledDelegate);
     OutputDelegate *outputDelegate = new OutputDelegate(view);
     view->setItemDelegateForColumn(5, outputDelegate);
-    deviceLayout->addWidget(view);
+    mainSplitter->addWidget(view);
 
-    axesView = new AxesView(deviceContainer);
+    subSplitter = new QSplitter(mainSplitter);
+    subSplitter->setOrientation(Qt::Horizontal);
+
+    axesView = new AxesView(subSplitter);
     axesView->setToolTip(tr("Axes Parameters:\n"
                             "   Check inverse to reverse axis direction.\n"
                             "   Set scale number for sensitivity. .1 to 10.0\n"
                             "   Drag and drop output axes to change device axes mapping.\n"
                             "   Changes here should take affect immediately and not require a service restart.\n"
                             "      Assuming the relevant device was detected and enabled upon service start."));
-    axesModel = new AxesModel(deviceContainer, deviceInfos);
+    axesModel = new AxesModel(subSplitter, deviceInfos);
     axesView->setModel(axesModel);
     InverseDelegate *inverseDelegate = new InverseDelegate(axesView);
     axesView->setItemDelegateForColumn(1, inverseDelegate);
-    deviceLayout->addWidget(axesView);
+    subSplitter->addWidget(axesView);
     connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesModel,
             SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
-    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesView,
-            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this,
+            SLOT(selectionUpdate(QModelIndex,QModelIndex)));
     connect(axesModel, SIGNAL(modelReset()), axesView, SLOT(openEditors()));
     connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), axesView,
             SLOT(outputChangedSlot(QModelIndex,QModelIndex)));
@@ -93,7 +95,17 @@ void Tab::buildGui()
     axesView->setItemDelegateForColumn(2, scaleDelegate);
     axesView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    stack->addWidget(deviceContainer);
+    buttonMapModel = new ButtonMapModel(subSplitter, deviceInfos);
+    buttonMapView = new ButtonMapView(subSplitter);
+    buttonMapView->setModel(buttonMapModel);
+    KeyDelegate *keyDelegate = new KeyDelegate(buttonMapView);
+    buttonMapView->setItemDelegateForColumn(1, keyDelegate);
+    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), buttonMapModel,
+            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+    subSplitter->addWidget(buttonMapView);
+
+    mainSplitter->addWidget(subSplitter);
+    stack->addWidget(mainSplitter);
 
     mainLayout->addWidget(stack);
     this->setLayout(mainLayout);
@@ -131,6 +143,24 @@ void Tab::driverStatus(bool signal)
 void Tab::driverStatusHelper()
 {
     this->driverStatus(true);
+}
+
+void Tab::selectionUpdate(const QModelIndex &current, const QModelIndex &previous)
+{
+    if (current.isValid())
+    {
+        QModelIndex sibling = current.sibling(current.row(), 5);
+        if (sibling.isValid())
+        {
+            OutputType::Output output = static_cast<OutputType::Output>(sibling.data(Qt::EditRole).toInt());
+            if (output == OutputType::DBUS)
+                subSplitter->hide();
+            else
+                subSplitter->show();
+        }
+    }
+    else
+        subSplitter->hide();
 }
 
 TableModel::TableModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
@@ -309,17 +339,17 @@ void OutputDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
 AxesModel::AxesModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
     deviceInfos(deviceInfosIn), infoIndex(-1)
 {
-    headerStrings.push_back("Device Axis");
-    headerStrings.push_back("Inverse");
-    headerStrings.push_back("Scale");
-    headerStrings.push_back("Output Axis");
+    headerStrings.push_back(tr("Device Axis"));
+    headerStrings.push_back(tr("Inverse"));
+    headerStrings.push_back(tr("Scale"));
+    headerStrings.push_back(tr("Output Axis"));
 
-    axisLabels.push_back("Translation X");
-    axisLabels.push_back("Translation Y");
-    axisLabels.push_back("Translation Z");
-    axisLabels.push_back("Rotation X");
-    axisLabels.push_back("Rotation Y");
-    axisLabels.push_back("Rotation Z");
+    axisLabels.push_back(tr("Translation X"));
+    axisLabels.push_back(tr("Translation Y"));
+    axisLabels.push_back(tr("Translation Z"));
+    axisLabels.push_back(tr("Rotation X"));
+    axisLabels.push_back(tr("Rotation Y"));
+    axisLabels.push_back(tr("Rotation Z"));
 }
 
 int AxesModel::rowCount(const QModelIndex &parent) const
@@ -539,24 +569,6 @@ void AxesView::mouseReleaseEvent(QMouseEvent *event)
     QTableView::mouseReleaseEvent(event);
 }
 
-void AxesView::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
-{
-    if (current.isValid())
-    {
-        QModelIndex sibling = current.sibling(current.row(), 5);
-        if (sibling.isValid())
-        {
-            OutputType::Output output = static_cast<OutputType::Output>(sibling.data(Qt::EditRole).toInt());
-            if (output == OutputType::DBUS)
-                this->hide();
-            else
-                this->show();
-        }
-    }
-    else
-        this->hide();
-}
-
 void AxesView::outputChangedSlot(const QModelIndex & topLeft, const QModelIndex & bottomRight)
 {
     if (topLeft.column() != 5)
@@ -645,4 +657,158 @@ void ScaleDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, con
 QString ScaleDelegate::displayText(const QVariant &value, const QLocale &locale) const
 {
     return locale.toString(value.toFloat(), 'f', 1);
+}
+
+ButtonMapModel::ButtonMapModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
+    deviceInfos(deviceInfosIn), infoIndex(-1)
+{
+    headerStrings.push_back(tr("Button Number"));
+    headerStrings.push_back(tr("Accelerator"));
+}
+
+int ButtonMapModel::rowCount(const QModelIndex &parent) const
+{
+    if (infoIndex == -1)
+        return 0;
+    return deviceInfos.at(infoIndex).buttonCount;
+}
+
+int ButtonMapModel::columnCount(const QModelIndex &parent) const
+{
+    if (infoIndex == -1)
+        return 0;
+    return 2;
+}
+
+QVariant ButtonMapModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+//    DeviceInfo temp = deviceInfos.at(infoIndex);
+    int column = index.column();
+    if (role == Qt::DisplayRole)
+    {
+        switch (column)
+        {
+        case 0:
+            return QLocale::system().toString(index.row() + 1);
+        case 1:
+            return deviceInfos.at(infoIndex).buttonKeyMap.value(index.row());
+        }
+    }
+    if (role == Qt::EditRole)
+    {
+//        switch (column)
+//        {
+//        case 3:
+//            return deviceInfos.at(infoIndex).axesMap.at(index.row());
+//        }
+    }
+    return QVariant();
+}
+
+QVariant ButtonMapModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
+        return QVariant();
+    return headerStrings.at(section);
+}
+
+Qt::ItemFlags ButtonMapModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    switch (index.column())
+    {
+    case 0:
+        return Qt::NoItemFlags;//device axis.
+    case 1:
+        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;//inverse
+    }
+
+    return QAbstractTableModel::flags(index);
+}
+
+bool ButtonMapModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!index.isValid() || role != Qt::EditRole)
+        return false;
+
+    switch (index.column())
+    {
+    case 1:
+        deviceInfos[infoIndex].buttonKeyMap.insert(index.row(), value.toString());
+        break;
+    default:
+        return false;
+    }
+    DeviceConfig::clearConfiguredDevices();
+    DeviceConfig::writeConfiguredDevices(this->deviceInfos);
+
+//    sendCommand(100 + deviceInfos[infoIndex].runTimeId);
+
+
+    emit dataChanged(index, index);
+    return true;
+}
+
+void ButtonMapModel::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
+{
+    this->beginResetModel();
+    if (current.isValid())
+        infoIndex = current.row();
+    else
+        infoIndex = -1;
+    this->endResetModel();
+}
+
+ButtonMapView::ButtonMapView(QWidget *parent) : QTableView(parent)
+{
+
+}
+
+KeyDelegate::KeyDelegate(QWidget *parent) : QStyledItemDelegate(parent)
+{
+
+}
+
+QWidget* KeyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    KeyDelegateEditLine *edit = new KeyDelegateEditLine(parent);
+    return edit;
+}
+
+void KeyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+
+}
+
+void KeyDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return;
+    KeyDelegateEditLine *edit = qobject_cast<KeyDelegateEditLine*>(editor);
+    if (!edit)
+        return;
+    QKeySequence sequence(edit->text(), QKeySequence::NativeText);
+    model->setData(index, sequence.toString(QKeySequence::PortableText));
+}
+
+QString KeyDelegate::displayText(const QVariant &value, const QLocale &locale) const
+{
+    QKeySequence sequence(value.toString(), QKeySequence::PortableText);
+    return sequence.toString(QKeySequence::NativeText);
+}
+
+KeyDelegateEditLine::KeyDelegateEditLine(QWidget *parent) : QLineEdit(parent)
+{
+
+}
+
+void KeyDelegateEditLine::keyPressEvent(QKeyEvent *event)
+{
+    QKeySequence sequence(event->modifiers() + event->key(), QKeySequence::NativeText);
+    this->setText(sequence.toString(QKeySequence::NativeText));
+    event->accept();
 }
