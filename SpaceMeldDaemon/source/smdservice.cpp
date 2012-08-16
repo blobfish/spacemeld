@@ -67,6 +67,7 @@ void SMDService::start()
             if (currentDevice->launch())
             {
                 qDebug() << currentDevice->info().modelName << " is ready";
+#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
                 if (currentDevice->info().output == OutputType::X11)
                 {
                     ExportX11 *x11 = ExportX11::instance();
@@ -80,6 +81,7 @@ void SMDService::start()
                     QObject::connect(currentDevice, SIGNAL(buttonOut(qint8, bool)), x11, SLOT(buttonIn(qint8, bool)));
 
                 }
+#endif
             }
             else
                 qDebug() << currentDevice->info().modelName << " launch FAILED";
