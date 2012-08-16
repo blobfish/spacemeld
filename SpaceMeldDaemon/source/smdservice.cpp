@@ -226,6 +226,7 @@ void SMDService::loadButtonMap(int deviceId)
     if ((!device->info().detected) || device->info().output == OutputType::DBUS)
         return;
 
+#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
     if (device->info().output == OutputType::X11)
     {
         DeviceInfos infos = DeviceConfig::readConfiguredDevices();
@@ -239,4 +240,5 @@ void SMDService::loadButtonMap(int deviceId)
             }
         }
     }
+#endif
 }
