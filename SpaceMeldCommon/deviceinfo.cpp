@@ -191,12 +191,12 @@ void dumpInfos (const DeviceInfos &infos)
         {
             stream << "      " << temp.axesMap.at(index);
         }
-        stream << endl << "   Button Map:" << endl;
+        stream << endl << "   Button Map:" << endl << "      ";
         QMap<int, QString>::const_iterator buttonIt;
         for (buttonIt = temp.buttonKeyMap.constBegin(); buttonIt != temp.buttonKeyMap.constEnd(); buttonIt++)
         {
-            stream << "      Button: " << buttonIt.key() << "   "
-                   << buttonIt.value();
+            stream << "Button " << buttonIt.key() << "="
+                   << buttonIt.value() << "   ";
         }
         stream << endl << endl;
     }
