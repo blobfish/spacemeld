@@ -121,8 +121,10 @@ void SMDService::processCommand(int code)
     //this might be a cause of problems of controller settings getting
     //out of sync with service.
 
-    if (code > 99)
+    if (code > 99 && code < 200)
         loadAxesMutate(code);
+    if (code > 199 && code < 300)
+        loadButtonMap(code);
 
 }
 
@@ -206,6 +208,35 @@ void SMDService::loadAxesMutate(int deviceId)
         {
             mutate->setConfig(*it);
             break;
+        }
+    }
+}
+
+void SMDService::loadButtonMap(int deviceId)
+{
+    deviceId -= 200;
+    DeviceBase *device = findById(deviceId);
+
+    if (!device)
+    {
+        qDebug() << "couldn't find run time id in SMDService::loadButtonMap for id: " << deviceId;
+        return;
+    }
+
+    if ((!device->info().detected) || device->info().output == OutputType::DBUS)
+        return;
+
+    if (device->info().output == OutputType::X11)
+    {
+        DeviceInfos infos = DeviceConfig::readConfiguredDevices();
+        DeviceInfos::Iterator it;
+        for (it = infos.begin(); it != infos.end(); ++it)
+        {
+            if ((*it).runTimeId == device->info().runTimeId)
+            {
+                ExportX11::instance()->setButtonMap(*it);
+                break;
+            }
         }
     }
 }

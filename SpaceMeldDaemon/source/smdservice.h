@@ -24,6 +24,7 @@ private:
     DeviceInfos reconcile(const DeviceInfos &configuredDeviceInfos);
     DeviceBase* findById(const int &findId);
     void loadAxesMutate(int deviceId);
+    void loadButtonMap(int deviceId);
 
     InterfaceSerial *serial;
     Devices detectedDevices;

@@ -746,8 +746,9 @@ bool ButtonMapModel::setData(const QModelIndex &index, const QVariant &value, in
     DeviceConfig::clearConfiguredDevices();
     DeviceConfig::writeConfiguredDevices(this->deviceInfos);
 
-//    sendCommand(100 + deviceInfos[infoIndex].runTimeId);
-
+    QtServiceController controller(SERVICE_NAME_STRING);
+    if (!controller.sendCommand(200 + deviceInfos[infoIndex].runTimeId))
+        qDebug() << "send command failed";
 
     emit dataChanged(index, index);
     return true;
