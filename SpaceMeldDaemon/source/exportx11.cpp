@@ -178,14 +178,18 @@ void ExportX11::sendKeyMessage(qint8 buttonNumber, bool buttonDown)
 
     XKeyEvent event;
     event.type = KeyPress;
+    event.root = XDefaultRootWindow(display);
+    event.subwindow = None;
     event.display = display;
     event.same_screen = True;
     event.keycode = XKeysymToKeycode(display, inputKey);
+    event.same_screen = True;
     event.state = modState;
 
     QVector<Window>::iterator it;
     for (it = clients.begin(); it != clients.end(); ++it)
     {
+        event.window = *it;
         XSendEvent(display, *it, True, KeyPressMask, (XEvent*)(&event));
     }
     XFlush(display);
