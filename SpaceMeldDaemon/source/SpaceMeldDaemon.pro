@@ -54,6 +54,6 @@ HEADERS += \
     deviceserialball4000flx.h \
     exportbase.h \
     axesmutator.h \
-    deviceconfig.h \
-    deviceinfo.h \
-    knowndevices.h \
+    ../../SpaceMeldCommon/deviceconfig.h \
+    ../../SpaceMeldCommon/deviceinfo.h \
+    ../../SpaceMeldCommon/knowndevices.h
