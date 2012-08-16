@@ -146,6 +146,7 @@ DeviceInfos SMDService::reconcile(const DeviceInfos &configuredDeviceInfos)
                 (*detectIt)->info().inverse = (*configuredIt).inverse;
                 (*detectIt)->info().scale = (*configuredIt).scale;
                 (*detectIt)->info().axesMap = (*configuredIt).axesMap;
+                (*detectIt)->info().buttonKeyMap = (*configuredIt).buttonKeyMap;
 
                 copiedConfigure.erase(configuredIt);
                 break;
