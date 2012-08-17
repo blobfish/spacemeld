@@ -98,6 +98,10 @@ void Tab::buildGui()
 
     buttonMapModel = new ButtonMapModel(subSplitter, deviceInfos);
     buttonMapView = new ButtonMapView(subSplitter);
+    buttonMapView->setToolTip(tr("Button Mapping:\n"
+                                 "   Edit(double click) accelerator table cell and press accelerator keys.\n"
+                                 "   Changes here should take affect immediately and not require a service restart.\n"
+                                 "      Assuming the relevant device was detected and enabled upon service start."));
     buttonMapView->setModel(buttonMapModel);
     KeyDelegate *keyDelegate = new KeyDelegate(buttonMapView);
     buttonMapView->setItemDelegateForColumn(1, keyDelegate);
