@@ -114,6 +114,10 @@ void Tab::buildGui()
 
     mainLayout->addWidget(stack);
     this->setLayout(mainLayout);
+
+    connect(mainSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(saveSplittersSlot(int,int)));
+    connect(subSplitter, SIGNAL(splitterMoved(int,int)), this, SLOT(saveSplittersSlot(int,int)));
+    loadSplitters();
 }
 
 void Tab::driverStatus(bool signal)
@@ -178,6 +182,21 @@ void Tab::selectionChangedSlot(const QModelIndex &current, const QModelIndex &pr
 
 }
 
+void Tab::saveSplittersSlot(int pos, int index)
+{
+    QSettings settings(QSettings::SystemScope, ORG_NAME_STRING, APP_NAME_STRING);
+    settings.setValue("mainSplitter", mainSplitter->saveState());
+    settings.setValue("subSplitter", subSplitter->saveState());
+}
+
+void Tab::loadSplitters()
+{
+    QSettings settings(QSettings::SystemScope, ORG_NAME_STRING, APP_NAME_STRING);
+    if (settings.contains("mainSplitter"))
+        mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
+    if (settings.contains("subSplitter"))
+        subSplitter->restoreState(settings.value("subSplitter").toByteArray());
+}
 
 TableModel::TableModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
     deviceInfos(deviceInfosIn)

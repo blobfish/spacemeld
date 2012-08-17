@@ -121,10 +121,12 @@ private slots:
     void driverStatusHelper();
     void selectionUpdate(int index);
     void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
+    void saveSplittersSlot(int pos, int index);
 
 
 private:
     void buildGui();
+    void loadSplitters();
 
     TableView *view;
     TableModel *model;
