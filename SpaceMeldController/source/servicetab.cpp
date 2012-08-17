@@ -5,6 +5,7 @@
 
 #include "definitions.h"
 #include "servicetab.h"
+#include "userpassworddialog.h"
 
 using namespace ServiceGui;
 
@@ -170,7 +171,20 @@ bool Tab::isServiceRunning()
 
 void Tab::goInstallButton()
 {
-    if (QtServiceController::install(getServicePath()))
+    QString username;
+    QString password;
+
+#ifdef Q_WS_WIN
+    UserPasswordDialog dialog;
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    if (!dialog.validate())
+        return;
+    username = dialog.getUsername();
+    password = dialog.getPassword();
+#endif
+
+    if (QtServiceController::install(getServicePath(), username, password))
     {
         startButton->setEnabled(true);
         stopButton->setEnabled(true);

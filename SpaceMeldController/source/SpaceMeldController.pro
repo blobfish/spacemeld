@@ -18,13 +18,15 @@ SOURCES += main.cpp\
     ../../SpaceMeldCommon/deviceconfig.cpp \
     ../../SpaceMeldCommon/deviceinfo.cpp \
     ../../SpaceMeldCommon/knowndevices.cpp \
+    userpassworddialog.cpp
 
 HEADERS  += mainwindow.h\
     servicetab.h \
     devicetab.h \
     deviceconfig.h \
     deviceinfo.h \
-    knowndevices.h
+    knowndevices.h \
+    userpassworddialog.h
 
 RESOURCES += \
     image.qrc
