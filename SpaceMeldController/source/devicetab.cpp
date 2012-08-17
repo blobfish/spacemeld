@@ -48,7 +48,7 @@ void Tab::buildGui()
     progress->setMaximum(0);
     stack->addWidget(progressWidget);
 
-    QSplitter *mainSplitter = new QSplitter(stack);
+    mainSplitter = new QSplitter(stack);
     mainSplitter->setOrientation(Qt::Vertical);
 
     view = new TableView(mainSplitter);

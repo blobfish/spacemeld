@@ -135,6 +135,7 @@ private:
     QStackedWidget *stack;
     DeviceInfos deviceInfos;
     QSplitter *subSplitter;
+    QSplitter *mainSplitter;
 };
 
 class BoolDelegate : public QStyledItemDelegate
