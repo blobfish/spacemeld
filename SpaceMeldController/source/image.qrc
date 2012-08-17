@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>spacemeld_thumbnail.png</file>
+    </qresource>
+</RCC>

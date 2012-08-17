@@ -25,3 +25,6 @@ HEADERS  += mainwindow.h\
     deviceconfig.h \
     deviceinfo.h \
     knowndevices.h
+
+RESOURCES += \
+    image.qrc

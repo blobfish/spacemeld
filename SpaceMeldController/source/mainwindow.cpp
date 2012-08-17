@@ -11,6 +11,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    this->setWindowIcon(QIcon(":/icon/spacemeld_thumbnail.png"));
     this->setWindowTitle("SpaceMeld Controller");
     tab = new QTabWidget(this);
 
