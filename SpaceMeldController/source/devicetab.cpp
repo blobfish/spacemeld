@@ -66,11 +66,13 @@ void Tab::buildGui()
     BoolDelegate *enabledDelegate = new BoolDelegate(view);
     view->setItemDelegateForColumn(1, enabledDelegate);
     OutputDelegate *outputDelegate = new OutputDelegate(view);
+    connect(outputDelegate, SIGNAL(currentIndexChanged(int)), this, SLOT(selectionUpdate(int)));
     view->setItemDelegateForColumn(5, outputDelegate);
     mainSplitter->addWidget(view);
 
     subSplitter = new QSplitter(mainSplitter);
     subSplitter->setOrientation(Qt::Horizontal);
+    subSplitter->hide();
 
     axesView = new AxesView(subSplitter);
     axesView->setToolTip(tr("Axes Parameters:\n"
@@ -87,10 +89,9 @@ void Tab::buildGui()
     connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesModel,
             SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
     connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this,
-            SLOT(selectionUpdate(QModelIndex,QModelIndex)));
+            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
     connect(axesModel, SIGNAL(modelReset()), axesView, SLOT(openEditors()));
-    connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), axesView,
-            SLOT(outputChangedSlot(QModelIndex,QModelIndex)));
+
     ScaleDelegate *scaleDelegate = new ScaleDelegate(axesView);
     axesView->setItemDelegateForColumn(2, scaleDelegate);
     axesView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -145,7 +146,16 @@ void Tab::driverStatusHelper()
     this->driverStatus(true);
 }
 
-void Tab::selectionUpdate(const QModelIndex &current, const QModelIndex &previous)
+void Tab::selectionUpdate(int index)
+{
+    OutputType::Output output = static_cast<OutputType::Output>(index);
+    if (output == OutputType::DBUS || output == OutputType::UNKNOWN)
+        subSplitter->hide();
+    else
+        subSplitter->show();
+}
+
+void Tab::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
 {
     if (current.isValid())
     {
@@ -161,7 +171,9 @@ void Tab::selectionUpdate(const QModelIndex &current, const QModelIndex &previou
     }
     else
         subSplitter->hide();
+
 }
+
 
 TableModel::TableModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
     deviceInfos(deviceInfosIn)
@@ -311,6 +323,7 @@ QWidget* OutputDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
 {
     QComboBox *box = new QComboBox(parent);
     box->setEditable(false);
+    connect(box, SIGNAL(currentIndexChanged(int)), this, SIGNAL(currentIndexChanged(int)));
     return box;
 }
 
@@ -567,20 +580,6 @@ void AxesView::mouseReleaseEvent(QMouseEvent *event)
         startDragIndex = -1;
     }
     QTableView::mouseReleaseEvent(event);
-}
-
-void AxesView::outputChangedSlot(const QModelIndex & topLeft, const QModelIndex & bottomRight)
-{
-    if (topLeft.column() != 5)
-    {
-        this->show();
-        return;
-    }
-    OutputType::Output tempOutput = static_cast<OutputType::Output>(topLeft.data(Qt::EditRole).toInt());
-    if (tempOutput == OutputType::DBUS)
-        this->hide();
-    else
-        this->show();
 }
 
 QWidget* InverseDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const

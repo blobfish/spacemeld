@@ -70,7 +70,6 @@ public:
     explicit AxesView(QWidget *parent = 0);
 public slots:
     void openEditors();
-    void outputChangedSlot(const QModelIndex & topLeft, const QModelIndex & bottomRight);
 protected:
     int startDragIndex;
     QPoint startPosition;
@@ -120,7 +119,9 @@ public slots:
 
 private slots:
     void driverStatusHelper();
-    void selectionUpdate(const QModelIndex &current, const QModelIndex &previous);
+    void selectionUpdate(int index);
+    void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
+
 
 private:
     void buildGui();
@@ -154,6 +155,8 @@ public:
     QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+signals:
+    void currentIndexChanged(int index);
 };
 
 class InverseDelegate : public QStyledItemDelegate
