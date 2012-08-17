@@ -23,9 +23,9 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h\
     servicetab.h \
     devicetab.h \
-    deviceconfig.h \
-    deviceinfo.h \
-    knowndevices.h \
+    ../../SpaceMeldCommon/deviceconfig.h \
+    ../../SpaceMeldCommon/deviceinfo.h \
+    ../../SpaceMeldCommon/knowndevices.h \
     userpassworddialog.h
 
 RESOURCES += \
