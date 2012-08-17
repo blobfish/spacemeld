@@ -27,10 +27,10 @@ inline const char* getString(ConnectionInterfaceType::ConnectionInterface index)
 namespace OutputType
 {
 enum Output {UNKNOWN, X11, DBUS, WIN, MAC};
-inline int size(){return 3;}
+inline int size(){return 5;}
 inline const char* getString(OutputType::Output index)
 {
-    static const char names[][10] = {"Unknown", "X11", "DBUS"};
+    static const char names[][10] = {"Unknown", "X11", "DBUS", "Win", "Mac"};
     return names[index];
 }
 }
