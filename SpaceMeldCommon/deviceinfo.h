@@ -26,14 +26,33 @@ inline const char* getString(ConnectionInterfaceType::ConnectionInterface index)
 
 namespace OutputType
 {
-enum Output {UNKNOWN, X11, DBUS, WIN, MAC};
-inline int size(){return 5;}
-inline const char* getString(OutputType::Output index)
+enum Output {UNKNOWN = -1, X11, DBUS, WIN, MAC};
+inline int size(){return 4;}
+inline Output getType(int index){return static_cast<Output>(index);}
+inline const char* getString(int index)
 {
-    static const char names[][10] = {"Unknown", "X11", "DBUS", "Win", "Mac"};
+    static const char names[][10] = {"X11", "DBUS", "Win", "Mac"};
     return names[index];
 }
 }
+
+class ExportInfo
+{
+public:
+    ExportInfo();
+    ExportInfo(QSettings &settings);
+    void writeSettings(QSettings &settings) const;
+    void clear();
+
+    OutputType::Output type;
+    bool enabled;
+    QVector<int> inverse;
+    QVector<float> scale;
+    QVector<int> axesMap;
+    QMap<int, QString> buttonKeyMap;
+
+};
+typedef QVector<ExportInfo> ExportInfos;
 
 class DeviceInfo
 {
@@ -54,13 +73,9 @@ public:
     QString path;
     bool enabled;
     bool detected;
-    OutputType::Output output;
+    ExportInfos exports;
     qint16 maxDisplacement;//positive number. This is for client convenience only. Driver will not check or adjust.
     qint8 buttonCount;//0 through buttonCount-1
-    QVector<int> inverse;
-    QVector<float> scale;
-    QVector<int> axesMap;
-    QMap<int, QString> buttonKeyMap;
 };
 
 typedef QVector<DeviceInfo> DeviceInfos;

@@ -10,7 +10,7 @@ class AxesMutator : public QObject
     Q_OBJECT
 public:
     enum Axis {TX, TY, TZ, RX, RY, RZ, ALL};
-    explicit AxesMutator(QObject *parent = 0);
+    explicit AxesMutator(QObject *parent, OutputType::Output outputIn);
     void invertAxes(Axis axis, bool signal);
     void setMap(const QVector<int> &mapIn);
     void setSensitivity(Axis axis, float scale);
@@ -26,6 +26,7 @@ private:
     QVector<int> inverse;
     QVector<int> axesMap;
     QVector<float> sensitivity;
+    OutputType::Output output;
 };
 
 #endif // AXESMUTATOR_H

@@ -68,11 +68,11 @@ void SMDService::start()
             {
                 qDebug() << currentDevice->info().modelName << " is ready";
 #if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
-                if (currentDevice->info().output == OutputType::X11)
+                if (currentDevice->info().exports.at(OutputType::X11).enabled)
                 {
                     ExportX11 *x11 = ExportX11::instance();
 
-                    AxesMutator *mutate = new AxesMutator(currentDevice);
+                    AxesMutator *mutate = new AxesMutator(currentDevice, OutputType::X11);
                     mutate->setObjectName("axesMutator");
                     mutate->setConfig(currentDevice->info());
                     QObject::connect(currentDevice, SIGNAL(displacementOut(QVector<qint16>)), mutate, SLOT(displacementIn(QVector<qint16>)));
@@ -136,19 +136,15 @@ DeviceInfos SMDService::reconcile(const DeviceInfos &configuredDeviceInfos)
     Devices::Iterator detectIt;
     for (detectIt = detectedDevices.begin(); detectIt != detectedDevices.end(); ++detectIt)
     {
+        (*detectIt)->info().runTimeId = runTimeIndex++;
         QList<DeviceInfo>::Iterator configuredIt;
         configuredIt = copiedConfigure.begin();
         while(configuredIt != copiedConfigure.end())
         {
             if ((*configuredIt).isEqual((*detectIt)->info()))
             {
-                (*detectIt)->info().runTimeId = runTimeIndex++;
                 (*detectIt)->info().enabled = (*configuredIt).enabled;
-                (*detectIt)->info().output = (*configuredIt).output;
-                (*detectIt)->info().inverse = (*configuredIt).inverse;
-                (*detectIt)->info().scale = (*configuredIt).scale;
-                (*detectIt)->info().axesMap = (*configuredIt).axesMap;
-                (*detectIt)->info().buttonKeyMap = (*configuredIt).buttonKeyMap;
+                (*detectIt)->info().exports = (*configuredIt).exports;
 
                 copiedConfigure.erase(configuredIt);
                 break;
@@ -190,7 +186,7 @@ void SMDService::loadAxesMutate(int deviceId)
         return;
     }
 
-    if ((!device->info().detected) || device->info().output == OutputType::DBUS)
+    if ((!device->info().detected) || device->info().exports.at(OutputType::DBUS).enabled)
         return;
 
     AxesMutator *mutate = device->findChild<AxesMutator *>("axesMutator");
@@ -223,11 +219,11 @@ void SMDService::loadButtonMap(int deviceId)
         return;
     }
 
-    if ((!device->info().detected) || device->info().output == OutputType::DBUS)
+    if ((!device->info().detected) || device->info().exports.at(OutputType::DBUS).enabled)
         return;
 
 #if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
-    if (device->info().output == OutputType::X11)
+    if (device->info().exports.at(OutputType::X11).enabled)
     {
         DeviceInfos infos = DeviceConfig::readConfiguredDevices();
         DeviceInfos::Iterator it;

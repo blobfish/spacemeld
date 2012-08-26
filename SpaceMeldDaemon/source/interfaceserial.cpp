@@ -32,6 +32,7 @@ void InterfaceSerial::detect()
     QList<SerialPortInfo> ports = SerialPortInfo::availablePorts();
     SerialPortInfo current;
 
+    statStream << endl << "Serial Interface:";
     foreach(current, ports)
     {
         statStream << endl << "port: " << current.systemLocation() << endl;

@@ -1,8 +1,8 @@
 #include <QDebug>
 #include "axesmutator.h"
 
-AxesMutator::AxesMutator(QObject *parent) :
-    QObject(parent)
+AxesMutator::AxesMutator(QObject *parent, OutputType::Output outputIn) :
+    QObject(parent), output(outputIn)
 {
     inverse.clear();
     inverse.reserve(6);
@@ -83,8 +83,8 @@ void AxesMutator::setSensitivity(AxesMutator::Axis axis, float scale)
 
 void AxesMutator::setConfig(const DeviceInfo &info)
 {
-    this->inverse = info.inverse;
-    this->sensitivity = info.scale;
-    this->axesMap = info.axesMap;
+    this->inverse = info.exports.at(output).inverse;
+    this->sensitivity = info.exports.at(output).scale;
+    this->axesMap = info.exports.at(output).axesMap;
 }
 

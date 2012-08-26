@@ -54,12 +54,7 @@ void Tab::buildGui()
     view = new TableView(mainSplitter);
     view->setToolTip(tr("Device list:\n"
                         "   enabled to false causes service to ignore the device.\n"
-                        "   output setting alters service to application communication.\n"
-                        "       X11: for unix/linux proprietary, legacy compatibility.\n"
-                        "       Win: for windows proprietary, legacy compatibility.\n"
-                        "       Mac: for macosx proprietary, legacy compatibility.\n"
-                        "       DBUS: for dbus compatibility. (new development).\n"
-                        "   Changes to enabled or output, will require a service restart."));
+                        "   Changes to enabled will require a service restart."));
     model = new TableModel(mainSplitter, deviceInfos);
     view->setModel(model);
     view->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -72,7 +67,25 @@ void Tab::buildGui()
 
     subSplitter = new QSplitter(mainSplitter);
     subSplitter->setOrientation(Qt::Horizontal);
-    subSplitter->hide();
+
+    exportModel = new ExportModel(subSplitter, deviceInfos);
+    exportView = new QTableView(subSplitter);
+    exportView->setToolTip(tr("Export Communication:\n"
+                              "   Devices can be mapping through different export protocols.\n"
+                              "      X11: for unix/linux proprietary, legacy compatibility.\n"
+                              "      Win: for windows proprietary, legacy compatibility.\n"
+                              "      Mac: for macosx proprietary, legacy compatibility.\n"
+                              "      DBUS: for dbus compatibility. (new development).\n"
+                              "         axes and button configuration for DBUS are done at client.\n"
+                              "   Changes here require a service restart to take affect."));
+    exportView->setModel(exportModel);
+    exportView->setSelectionMode(QAbstractItemView::SingleSelection);
+    BoolDelegate *exportDelegate = new BoolDelegate(exportView);
+    exportView->setItemDelegateForColumn(1, exportDelegate);
+    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), exportModel,
+            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+
+    subSplitter->addWidget(exportView);
 
     axesView = new AxesView(subSplitter);
     axesView->setToolTip(tr("Axes Parameters:\n"
@@ -88,8 +101,8 @@ void Tab::buildGui()
     subSplitter->addWidget(axesView);
     connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesModel,
             SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
-    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this,
-            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+    connect(exportView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), axesModel,
+            SLOT(exportChangedSlot(QModelIndex,QModelIndex)));
     connect(axesModel, SIGNAL(modelReset()), axesView, SLOT(openEditors()));
 
     ScaleDelegate *scaleDelegate = new ScaleDelegate(axesView);
@@ -107,6 +120,8 @@ void Tab::buildGui()
     buttonMapView->setItemDelegateForColumn(1, keyDelegate);
     connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), buttonMapModel,
             SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+    connect(exportView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), buttonMapModel,
+            SLOT(exportChangedSlot(QModelIndex,QModelIndex)));
     subSplitter->addWidget(buttonMapView);
 
     mainSplitter->addWidget(subSplitter);
@@ -156,30 +171,11 @@ void Tab::driverStatusHelper()
 
 void Tab::selectionUpdate(int index)
 {
-    OutputType::Output output = static_cast<OutputType::Output>(index);
-    if (output == OutputType::DBUS || output == OutputType::UNKNOWN)
-        subSplitter->hide();
-    else
-        subSplitter->show();
-}
-
-void Tab::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
-{
-    if (current.isValid())
-    {
-        QModelIndex sibling = current.sibling(current.row(), 5);
-        if (sibling.isValid())
-        {
-            OutputType::Output output = static_cast<OutputType::Output>(sibling.data(Qt::EditRole).toInt());
-            if (output == OutputType::DBUS)
-                subSplitter->hide();
-            else
-                subSplitter->show();
-        }
-    }
-    else
-        subSplitter->hide();
-
+//    OutputType::Output output = static_cast<OutputType::Output>(index);
+//    if (output == OutputType::DBUS || output == OutputType::UNKNOWN)
+//        subSplitter->hide();
+//    else
+//        subSplitter->show();
 }
 
 void Tab::saveSplittersSlot(int pos, int index)
@@ -206,7 +202,6 @@ TableModel::TableModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractT
     headerStrings.push_back("Detected");
     headerStrings.push_back("Interface");
     headerStrings.push_back("Path");
-    headerStrings.push_back("Output");
 }
 
 int TableModel::rowCount(const QModelIndex &parent) const
@@ -216,7 +211,7 @@ int TableModel::rowCount(const QModelIndex &parent) const
 
 int TableModel::columnCount(const QModelIndex &parent) const
 {
-    return 6;
+    return headerStrings.size();
 }
 
 QVariant TableModel::data(const QModelIndex &index, int role) const
@@ -238,15 +233,6 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
             return ConnectionInterfaceType::getString(deviceInfos.at(index.row()).interfaceId);
         case 4:
             return deviceInfos.at(index.row()).path;
-        case 5:
-            return OutputType::getString(deviceInfos.at(index.row()).output);
-        }
-    }
-    if (role == Qt::EditRole)
-    {
-        switch (column)
-        {
-        case 5: return static_cast<int>(deviceInfos.at(index.row()).output);
         }
     }
     return QVariant();
@@ -293,9 +279,6 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
     case 1:
         deviceInfos[index.row()].enabled = value.toBool();
         break;
-    case 5:
-        deviceInfos[index.row()].output = static_cast<OutputType::Output>(value.toInt());
-        break;
     default:
         return false;
     }
@@ -304,11 +287,6 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
     emit dataChanged(index, index);
     return true;
-}
-
-TableView::TableView(QWidget *parent) : QTableView(parent)
-{
-
 }
 
 QWidget* BoolDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -373,7 +351,7 @@ void OutputDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
 }
 
 AxesModel::AxesModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
-    deviceInfos(deviceInfosIn), infoIndex(-1)
+    deviceInfos(deviceInfosIn), infoIndex(-1), exportId(-1)
 {
     headerStrings.push_back(tr("Device Axis"));
     headerStrings.push_back(tr("Inverse"));
@@ -390,14 +368,14 @@ AxesModel::AxesModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTab
 
 int AxesModel::rowCount(const QModelIndex &parent) const
 {
-    if (infoIndex == -1)
+    if (infoIndex == -1 || exportId == -1)
         return 0;
     return 6;
 }
 
 int AxesModel::columnCount(const QModelIndex &parent) const
 {
-    if (infoIndex == -1)
+    if (infoIndex == -1 || exportId == -1)
         return 0;
     return headerStrings.size();
 }
@@ -415,11 +393,11 @@ QVariant AxesModel::data(const QModelIndex &index, int role) const
         case 0:
             return axisLabels.at(index.row());
         case 1:
-            return temp.inverse.at(index.row());
+            return temp.exports.at(exportId).inverse.at(index.row());
         case 2:
-            return temp.scale.at(index.row());
+            return temp.exports.at(exportId).scale.at(index.row());
         case 3:
-            return axisLabels.at(temp.axesMap.at(index.row()));
+            return axisLabels.at(temp.exports.at(exportId).axesMap.at(index.row()));
         }
     }
     if (role == Qt::EditRole)
@@ -427,7 +405,8 @@ QVariant AxesModel::data(const QModelIndex &index, int role) const
         switch (column)
         {
         case 3:
-            return deviceInfos.at(infoIndex).axesMap.at(index.row());
+            return deviceInfos.at(infoIndex).exports.at(exportId).axesMap.at(index.row());
+            return 0;
         }
     }
     return QVariant();
@@ -469,13 +448,13 @@ bool AxesModel::setData(const QModelIndex &index, const QVariant &value, int rol
     switch (index.column())
     {
     case 1:
-        deviceInfos[infoIndex].inverse[index.row()] = value.toInt();
+        deviceInfos[infoIndex].exports[exportId].inverse[index.row()] = value.toInt();
         break;
     case 2:
-        deviceInfos[infoIndex].scale[index.row()] = value.toDouble();
+        deviceInfos[infoIndex].exports[exportId].scale[index.row()] = value.toDouble();
         break;
     case 3:
-        deviceInfos[infoIndex].axesMap[index.row()] = value.toInt();
+        deviceInfos[infoIndex].exports[exportId].axesMap[index.row()] = value.toInt();
         break;
     default:
         return false;
@@ -519,6 +498,22 @@ void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelInd
         infoIndex = current.row();
     else
         infoIndex = -1;
+    exportId = -1;//user has to reselect the output
+    this->endResetModel();
+}
+
+void AxesModel::exportChangedSlot(const QModelIndex &current, const QModelIndex &previous)
+{
+    this->beginResetModel();
+    if (current.isValid())
+    {
+        if (OutputType::getType(current.row()) == OutputType::DBUS)
+            exportId = -1;
+        else
+            exportId = current.row();
+    }
+    else
+        exportId = -1;
     this->endResetModel();
 }
 
@@ -682,7 +677,7 @@ QString ScaleDelegate::displayText(const QVariant &value, const QLocale &locale)
 }
 
 ButtonMapModel::ButtonMapModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
-    deviceInfos(deviceInfosIn), infoIndex(-1)
+    deviceInfos(deviceInfosIn), infoIndex(-1), exportId(-1)
 {
     headerStrings.push_back(tr("Button Number"));
     headerStrings.push_back(tr("Accelerator"));
@@ -690,14 +685,14 @@ ButtonMapModel::ButtonMapModel(QObject *parent, DeviceInfos &deviceInfosIn) : QA
 
 int ButtonMapModel::rowCount(const QModelIndex &parent) const
 {
-    if (infoIndex == -1)
+    if (infoIndex == -1 || exportId == -1)
         return 0;
     return deviceInfos.at(infoIndex).buttonCount;
 }
 
 int ButtonMapModel::columnCount(const QModelIndex &parent) const
 {
-    if (infoIndex == -1)
+    if (infoIndex == -1 || exportId == -1)
         return 0;
     return 2;
 }
@@ -706,7 +701,6 @@ QVariant ButtonMapModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
-//    DeviceInfo temp = deviceInfos.at(infoIndex);
     int column = index.column();
     if (role == Qt::DisplayRole)
     {
@@ -715,16 +709,16 @@ QVariant ButtonMapModel::data(const QModelIndex &index, int role) const
         case 0:
             return QLocale::system().toString(index.row() + 1);
         case 1:
-            return deviceInfos.at(infoIndex).buttonKeyMap.value(index.row());
+            return deviceInfos.at(infoIndex).exports.at(exportId).buttonKeyMap.value(index.row());
         }
     }
     if (role == Qt::EditRole)
     {
-//        switch (column)
-//        {
-//        case 3:
-//            return deviceInfos.at(infoIndex).axesMap.at(index.row());
-//        }
+        switch (column)
+        {
+        case 3:
+            return deviceInfos.at(infoIndex).exports.at(exportId).axesMap.at(index.row());
+        }
     }
     return QVariant();
 }
@@ -760,7 +754,7 @@ bool ButtonMapModel::setData(const QModelIndex &index, const QVariant &value, in
     switch (index.column())
     {
     case 1:
-        deviceInfos[infoIndex].buttonKeyMap.insert(index.row(), value.toString());
+        deviceInfos[infoIndex].exports[exportId].buttonKeyMap.insert(index.row(), value.toString());
         break;
     default:
         return false;
@@ -777,6 +771,118 @@ bool ButtonMapModel::setData(const QModelIndex &index, const QVariant &value, in
 }
 
 void ButtonMapModel::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
+{
+    this->beginResetModel();
+    if (current.isValid())
+        infoIndex = current.row();
+    else
+        infoIndex = -1;
+    exportId = -1;//user has to reselect the output
+    this->endResetModel();
+}
+
+void ButtonMapModel::exportChangedSlot(const QModelIndex &current, const QModelIndex &previous)
+{
+    this->beginResetModel();
+    if (current.isValid())
+    {
+        if (OutputType::getType(current.row()) == OutputType::DBUS)
+            exportId = -1;
+        else
+            exportId = current.row();
+    }
+    else
+        exportId = -1;
+    this->endResetModel();
+}
+
+ExportModel::ExportModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
+    deviceInfos(deviceInfosIn), infoIndex(-1)
+{
+    headerStrings.push_back(tr("Export"));
+    headerStrings.push_back(tr("Enabled"));
+}
+
+int ExportModel::rowCount(const QModelIndex &parent) const
+{
+    if (infoIndex == -1)
+        return 0;
+    return OutputType::size();
+}
+
+int ExportModel::columnCount(const QModelIndex &parent) const
+{
+    if (infoIndex == -1)
+        return 0;
+    return headerStrings.size();
+}
+
+QVariant ExportModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+    int column = index.column();
+    if (role == Qt::DisplayRole)
+    {
+        switch (column)
+        {
+        case 0:
+            return OutputType::getString(index.row());
+        case 1:
+            return deviceInfos.at(infoIndex).exports.at(index.row()).enabled;
+        }
+    }
+    return QVariant();
+}
+
+QVariant ExportModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
+        return QVariant();
+    return headerStrings.at(section);
+}
+
+Qt::ItemFlags ExportModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    switch (index.column())
+    {
+    case 0:
+        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    case 1:
+        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;//inverse
+    }
+
+    return QAbstractTableModel::flags(index);
+}
+
+bool ExportModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!index.isValid() || role != Qt::EditRole)
+        return false;
+
+    switch (index.column())
+    {
+    case 1:
+        deviceInfos[infoIndex].exports[index.row()].enabled = value.toBool();
+        break;
+    default:
+        return false;
+    }
+    DeviceConfig::clearConfiguredDevices();
+    DeviceConfig::writeConfiguredDevices(this->deviceInfos);
+
+    QtServiceController controller(SERVICE_NAME_STRING);
+    if (!controller.sendCommand(200 + deviceInfos[infoIndex].runTimeId))
+        qDebug() << "send command failed";
+
+    emit dataChanged(index, index);
+    return true;
+}
+
+void ExportModel::selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous)
 {
     this->beginResetModel();
     if (current.isValid())

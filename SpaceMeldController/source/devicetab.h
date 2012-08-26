@@ -20,7 +20,7 @@ class TableView : public QTableView
 {
     Q_OBJECT
 public:
-    explicit TableView(QWidget *parent = 0);
+    explicit TableView(QWidget *parent = 0) : QTableView(parent){}
 };
 
 class TableModel : public QAbstractTableModel
@@ -54,12 +54,14 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 public slots:
     void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
+    void exportChangedSlot(const QModelIndex &current, const QModelIndex &previous);
 
 private:
     void sendCommand(int command);
     QStringList headerStrings;
     DeviceInfos &deviceInfos;
     int infoIndex;
+    int exportId;
     QStringList axisLabels;
 };
 
@@ -85,6 +87,28 @@ class ButtonMapModel : public QAbstractTableModel
     Q_OBJECT
 public:
     explicit ButtonMapModel(QObject *parent, DeviceInfos &deviceInfosIn);
+    int rowCount(const QModelIndex &parent) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+public slots:
+    void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
+    void exportChangedSlot(const QModelIndex &current, const QModelIndex &previous);
+
+private:
+    QStringList headerStrings;
+    DeviceInfos &deviceInfos;
+    int infoIndex;
+    int exportId;
+};
+
+class ExportModel : public QAbstractTableModel
+{
+    Q_OBJECT
+public:
+    explicit ExportModel(QObject *parent, DeviceInfos &deviceInfosIn);
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -120,7 +144,6 @@ public slots:
 private slots:
     void driverStatusHelper();
     void selectionUpdate(int index);
-    void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
     void saveSplittersSlot(int pos, int index);
 
 
@@ -138,6 +161,8 @@ private:
     DeviceInfos deviceInfos;
     QSplitter *subSplitter;
     QSplitter *mainSplitter;
+    QTableView *exportView;
+    ExportModel *exportModel;
 };
 
 class BoolDelegate : public QStyledItemDelegate

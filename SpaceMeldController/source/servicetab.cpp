@@ -141,11 +141,15 @@ void Tab::initialize()
     {
         startButton->setChecked(true);
         interfaceListWidget->setEnabled(false);
+        installButton->setEnabled(false);
+        uninstallButton->setEnabled(false);
     }
     else
     {
         stopButton->setChecked(true);
         interfaceListWidget->setEnabled(true);
+        installButton->setEnabled(true);
+        uninstallButton->setEnabled(true);
     }
 
     this->setLayout(mainLayout);

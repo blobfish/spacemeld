@@ -218,7 +218,7 @@ void ExportX11::sendButtonMessage(qint8 buttonNumber, bool buttonDown)
 
 void ExportX11::setButtonMap(const DeviceInfo &info)
 {
-    buttonKeyMap = info.buttonKeyMap;
+    buttonKeyMap = info.exports.at(static_cast<int>(OutputType::X11)).buttonKeyMap;
 }
 
 #endif
