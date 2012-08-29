@@ -66,9 +66,9 @@ void DeviceSerialBall4000FLX::processPacket(const QByteArray &packet)
     QByteArray temp = cleanseEscape(packet);
     if (temp.startsWith('@'))
         qDebug() << "hardware reset";//what to do?
-    if (temp.startsWith('D') and temp.size() == 15)
+    if (temp.startsWith('D') && temp.size() == 15)
         processDisplacementPacket(packet);
-    if (temp.startsWith('K') and temp.size() == 7)
+    if (temp.startsWith('K') && temp.size() == 7)
         processButtonPacket(packet);
 }
 
