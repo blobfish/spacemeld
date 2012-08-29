@@ -16,9 +16,10 @@
 #This file contains common parameters for multiple spacemeld projects.
 #Any custom build parameters will also be located here.
 
-#relative path to qtservice pri.
-#This path should be updated to reflect the qtservice.pri location.
-include(../../../../QtSolutions/qt-solutions/qtservice/src/qtservice.pri)
+#Qt Solutions.
+#SOLUTIONS_ROOT should be passed in through qmake. i.e.
+# qmake ... SOLUTIONS_ROOT = C:/Users/bendover/development/qt-solutions"
+include($$SOLUTIONS_ROOT/qtservice/src/qtservice.pri)
 
 #path is relative to the file including this file and not where this file is located.
 #This should be fine as long as directory structure of project/s is original.
