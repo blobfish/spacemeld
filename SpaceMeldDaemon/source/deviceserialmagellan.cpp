@@ -43,12 +43,14 @@ bool DeviceSerialMagellan::launch()
 
 bool DeviceSerialMagellan::setPort(SerialPort &aPort)
 {
-    aPort.setRts(true);
-    aPort.setDtr(true);
-
+    aPort.setRate(SerialPort::Rate9600);
     aPort.setDataBits(SerialPort::Data8);
     aPort.setStopBits(SerialPort::TwoStop);
     aPort.setFlowControl(SerialPort::HardwareControl);
+    aPort.setParity(SerialPort::NoParity);
+
+    aPort.setDtr(true);
+    aPort.setRts(true);
 
     if (aPort.error() != SerialPort::NoError)
         return false;
@@ -86,7 +88,6 @@ bool DeviceSerialMagellan::initialize()
 QString DeviceSerialMagellan::versionString(SerialPort &aPort)
 {
     //if this isn't broken, don't fix it!
-    DeviceSerialMagellan::setPort(aPort);
 
     //\rvz\r      //to reset the device. Not using.
     aPort.write("\r\rm0\r");

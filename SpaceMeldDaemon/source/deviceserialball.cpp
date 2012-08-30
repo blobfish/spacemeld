@@ -44,10 +44,14 @@ bool DeviceSerialBall::launch()
 
 bool DeviceSerialBall::setPort(SerialPort &aPort)
 {
+    aPort.setRate(SerialPort::Rate9600);
+    aPort.setFlowControl(SerialPort::SoftwareControl);
+    aPort.setDataBits(SerialPort::Data8);
+    aPort.setStopBits(SerialPort::OneStop);
+    aPort.setParity(SerialPort::NoParity);
+
     aPort.setRts(true);
     aPort.setDtr(true);
-
-    aPort.setDataBits(SerialPort::Data8);
 
     if (aPort.error() != SerialPort::NoError)
         return false;
@@ -81,9 +85,10 @@ QString DeviceSerialBall::versionString(SerialPort &aPort)
     while(aPort.waitForReadyRead(1000))
         temp += aPort.readAll();
 
-    aPort.write("@\r");
-    while(aPort.waitForReadyRead(1000))
-        temp += aPort.readAll();
+    //don't think I need this.
+//    aPort.write("@\r");
+//    while(aPort.waitForReadyRead(1000))
+//        temp += aPort.readAll();
 
     aPort.write("hm\r");
     while(aPort.waitForReadyRead(1000))
@@ -93,9 +98,9 @@ QString DeviceSerialBall::versionString(SerialPort &aPort)
     while(aPort.waitForReadyRead(1000))
         temp += aPort.readAll();
 
-    QByteArray message = temp;
-    message.replace('\r', '\n');
-    qDebug() << message;
+//    QByteArray message = temp;
+//    message.replace('\r', '\n');
+//    qDebug() << message;
 
     return temp;
 }

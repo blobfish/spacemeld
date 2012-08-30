@@ -199,8 +199,6 @@ void Tab::goInstallButton()
     UserPasswordDialog dialog;
     if (dialog.exec() != QDialog::Accepted)
         return;
-    if (!dialog.validate())
-        return;
     username = dialog.getUsername();
     password = dialog.getPassword();
 #endif
@@ -213,6 +211,9 @@ void Tab::goInstallButton()
         browseButton->setEnabled(false);
         pathEdit->setEnabled(false);
     }
+    else
+        QMessageBox::critical(0, tr("SpaceMeld"), tr("Failed to install SpaceMeld service.\n"
+                              "Is SpaceMeldController running as Administrator?"));
 }
 
 void Tab::goUninstallButton()
@@ -226,6 +227,9 @@ void Tab::goUninstallButton()
         browseButton->setEnabled(true);
         pathEdit->setEnabled(true);
     }
+    else
+        QMessageBox::critical(0, tr("SpaceMeld"), tr("Failed to uninstall SpaceMeld service.\n"
+                              "Is SpaceMeldController running as Administrator?"));
 }
 
 void Tab::goStartButton()
@@ -241,6 +245,9 @@ void Tab::goStartButton()
         interfaceDisableButton->setEnabled(false);
         emit driverStatus(true);
     }
+    else
+        QMessageBox::critical(0, tr("SpaceMeld"), tr("Failed to start SpaceMeld service.\n"
+                                                 "Is SpaceMeldController running as Administrator?"));
 }
 
 void Tab::goStopButton()
@@ -259,6 +266,9 @@ void Tab::goStopButton()
         }
         emit driverStatus(false);
     }
+    else
+        QMessageBox::critical(0, tr("SpaceMeld"), tr("Failed to stop SpaceMeld service.\n"
+                                                 "Is SpaceMeldController running as Administrator?"));
 }
 
 void Tab::goBrowse()

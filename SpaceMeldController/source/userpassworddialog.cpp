@@ -38,6 +38,7 @@ void UserPasswordDialog::buildGui()
     QLabel *usernameLabel = new QLabel("Username:", this);
     QLabel *passwordLabel = new QLabel("Password:", this);
     usernameEdit = new QLineEdit(this);
+    usernameEdit->setText(".\\LocalSystem");
     passwordEdit = new QLineEdit(this);
     passwordEdit->setEchoMode(QLineEdit::Password);
 
@@ -57,13 +58,6 @@ void UserPasswordDialog::buildGui()
     connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
 
     this->setLayout(mainLayout);
-}
-
-bool UserPasswordDialog::validate() const
-{
-    if (usernameEdit->text().isEmpty() || passwordEdit->text().isEmpty())
-        return false;
-    return true;
 }
 
 QString UserPasswordDialog::getUsername() const

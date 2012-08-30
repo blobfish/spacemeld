@@ -26,7 +26,6 @@ class UserPasswordDialog : public QDialog
     Q_OBJECT
 public:
     explicit UserPasswordDialog(QWidget *parent = 0);
-    bool validate() const;
     QString getUsername() const;
     QString getPassword() const;
 private:

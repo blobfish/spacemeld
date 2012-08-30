@@ -91,6 +91,7 @@ void InterfaceSerial::detect()
 
 bool InterfaceSerial::detectBall(SerialPort &aPort, const SerialPortInfo &info)
 {
+    DeviceSerialBall::setPort(aPort);
     QString version = DeviceSerialBall::versionString(aPort);
     if (!version.isEmpty())
     {
@@ -115,6 +116,7 @@ bool InterfaceSerial::detectBall(SerialPort &aPort, const SerialPortInfo &info)
 
 bool InterfaceSerial::detectMagellan(SerialPort &aPort, const SerialPortInfo &info)
 {
+    DeviceSerialMagellan::setPort(aPort);
     QString version = DeviceSerialMagellan::versionString(aPort);
     if (!version.isEmpty())
     {
