@@ -21,6 +21,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon(":/icon/spacemeld_thumbnail.png"));
     MainWindow w;
     w.show();
     

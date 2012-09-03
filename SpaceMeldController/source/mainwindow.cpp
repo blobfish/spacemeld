@@ -28,7 +28,6 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    this->setWindowIcon(QIcon(":/icon/spacemeld_thumbnail.png"));
     this->setWindowTitle("SpaceMeld Controller");
     tab = new QTabWidget(this);
 
