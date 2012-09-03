@@ -192,6 +192,8 @@ bool Tab::isServiceRunning()
 
 void Tab::goInstallButton()
 {
+    if (isServiceInstalled())
+        return;
     QString username;
     QString password;
 
@@ -221,6 +223,8 @@ void Tab::goInstallButton()
 
 void Tab::goUninstallButton()
 {
+    if (!isServiceInstalled())
+        return;
     QtServiceController controller(SERVICE_NAME_STRING);
     if (controller.uninstall())
     {
@@ -240,6 +244,8 @@ void Tab::goUninstallButton()
 
 void Tab::goStartButton()
 {
+    if (isServiceRunning())
+        return;
     QtServiceController controller(SERVICE_NAME_STRING);
     if (controller.start())
     {
@@ -261,6 +267,8 @@ void Tab::goStartButton()
 
 void Tab::goStopButton()
 {
+    if (!isServiceRunning())
+        return;
     QtServiceController controller(SERVICE_NAME_STRING);
     if (controller.stop())
     {
