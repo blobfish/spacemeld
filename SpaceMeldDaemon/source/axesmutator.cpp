@@ -60,7 +60,12 @@ void AxesMutator::displacementIn(QVector<qint16> values)
     valuesOut.resize(6);
 
     for (int index(0); index < 6; ++index)
-        valuesOut[axesMap.at(index)] = static_cast<qint16> (values.at(index) * inverse.at(index) * sensitivity.at(index));
+    {
+        qint16 temp = static_cast<qint16> (values.at(index) * inverse.at(index) * sensitivity.at(index));
+        if (output == OutputType::WIN)
+            temp = sanitizeWin(temp, index);
+        valuesOut[axesMap.at(index)] = temp;
+    }
 
     emit displacementOut(valuesOut);
 }
@@ -103,5 +108,32 @@ void AxesMutator::setConfig(const DeviceInfo &info)
     this->inverse = info.exports.at(output).inverse;
     this->sensitivity = info.exports.at(output).scale;
     this->axesMap = info.exports.at(output).axesMap;
+}
+
+qint16 AxesMutator::sanitizeWin(qint16 value, int index)
+{
+    //win export has the 6 axes values spanned across 2 DWORDS(32 bit). 3 axes per DWORD.
+    //protocol breaks the 32 bit DWORD to:
+        //first 11 bits to first axes.
+        //second 11 bits to second axes.
+        //last 10 bits to third axes.
+    //problem occurs when the number gets big/small enough to bleed into sign bit
+        //thus changing direction of movement. This becomes more apparent with a high scale factor.
+    //here we are keeping the values within the range of bits.
+    //x and y get 11 bits and z gets 10. use index to see what the max/min return should be.
+    if (index == 2 || index ==5)
+    {
+        //z axes.
+        if (value > 255)
+            return 255;
+        if (value < -256)
+            return -256;
+    }
+    //x and y axes
+    if (value > 511)
+        return 511;
+    if (value < -512)
+        return -512;
+    return value;
 }
 

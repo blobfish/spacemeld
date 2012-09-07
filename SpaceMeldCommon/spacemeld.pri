@@ -29,3 +29,4 @@ INCLUDEPATH += ../../SpaceMeldCommon
 #control whether X11 output is built or not. Remarking the following line will turn off X11 support even on a
 #X11 platform.
 SPACE_MELD_CONFIG += USER_BUILD_X11
+SPACE_MELD_CONFIG += USER_BUILD_EXPORT_WIN_MAG

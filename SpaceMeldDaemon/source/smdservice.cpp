@@ -23,11 +23,8 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include "interfaceserial.h"
 #include "deviceconfig.h"
 #include "smdservice.h"
-
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
 #include "exportx11.h"
-#endif
-
+#include "exportwinmag.h"
 #include "monitor.h"
 #include "axesmutator.h"
 
@@ -99,7 +96,22 @@ void SMDService::start()
                     QObject::connect(currentDevice, SIGNAL(buttonOut(qint8, bool)), x11, SLOT(buttonIn(qint8, bool)));
 
                 }
-#endif
+#endif //Q_WS_X11
+#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_WIN_MAG)
+                if (currentDevice->info().exports.at(OutputType::WIN).enabled)
+                {
+                    ExportWinMag *winMag = ExportWinMag::instance();
+
+                    AxesMutator *mutate = new AxesMutator(currentDevice, OutputType::WIN);
+                    mutate->setObjectName("axesMutator");
+                    mutate->setConfig(currentDevice->info());
+                    QObject::connect(currentDevice, SIGNAL(displacementOut(QVector<qint16>)), mutate, SLOT(displacementIn(QVector<qint16>)));
+                    winMag->setButtonMap(currentDevice->info());
+
+                    QObject::connect(mutate, SIGNAL(displacementOut(QVector<qint16>)), winMag, SLOT(displacementIn(QVector<qint16>)));
+                    QObject::connect(currentDevice, SIGNAL(buttonOut(qint8,bool)), winMag, SLOT(buttonIn(qint8,bool)));
+                }
+#endif //Q_WS_WIN
             }
             else
                 qDebug() << currentDevice->info().modelName << " launch FAILED";

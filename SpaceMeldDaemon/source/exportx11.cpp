@@ -27,7 +27,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ExportX11::ExportX11(QObject *parent) :
-    ExportBase(parent), initializedTest(false)
+    ExportBase(parent)
 {
     display = 0;
     xWindow = 0;
@@ -111,7 +111,7 @@ void ExportX11::xEventsIn()
         XNextEvent(display, &event);
         if (event.type == ClientMessage && event.xclient.message_type == xEventCommand)
         {
-            if (event.xclient.data.s[2] == 27695)//defined by magellan protocol
+            if (event.xclient.data.s[2] == Magellan::SetWindowCommand)
             {
                 quint32 windowId = static_cast<quint32>((event.xclient.data.s[0] << 16) | event.xclient.data.s[1]);
                 clients.push_back(static_cast<Window>(windowId));

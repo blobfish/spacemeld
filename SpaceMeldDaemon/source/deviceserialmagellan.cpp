@@ -60,21 +60,13 @@ bool DeviceSerialMagellan::setPort(SerialPort &aPort)
 
 bool DeviceSerialMagellan::initialize()
 {
-    port->write("\r");
-    port->write("\r\rm0\r");        //stop transmitting text packets
-    port->write("c03\r");           //turn off rotation and and translation
-    port->write("z\r");             //zero device
-    port->write("Z\r");
-    port->write("l000\r");          //stop transmitting binary packets
-    port->write("pAA\r");           //transmit every 60 ms data
-    port->write("q00\r");           //default translation and rotation sensativity.
-    port->write("nM\r");            //zero radius. 0-15 defaults to 13
-    port->write("z\r");             //zero device
-    port->write("c33\r");           //set translation, rotation on and dominant axis off
-    port->write("l2\r");
-    port->write("\0\r");
-    port->write("\r\r");
-    port->write("l300\r");            //puts device in binary packet mode?? m3 for ascii mode.
+    port->write(SerialMagellanConstants::Init);
+    port->write(SerialMagellanConstants::NullRadiusDefault);
+    port->write(SerialMagellanConstants::SensitivityDefault);
+    port->write(SerialMagellanConstants::PeriodDefault);
+    port->write(SerialMagellanConstants::ModeDefault);
+    port->write(SerialMagellanConstants::ModeCompressed);
+    port->write(SerialMagellanConstants::ShortBeep);
 
     if (port->error() != SerialPort::NoError)
     {
@@ -87,26 +79,16 @@ bool DeviceSerialMagellan::initialize()
 
 QString DeviceSerialMagellan::versionString(SerialPort &aPort)
 {
-    //if this isn't broken, don't fix it!
-
-    //\rvz\r      //to reset the device. Not using.
-    aPort.write("\r\rm0\r");
-    aPort.write("\r");
-    aPort.write("\r\rm0\r");
-    aPort.write("c03\r");
-    aPort.write("z\r");
-    aPort.write("Z\r");
-    aPort.write("l000\r");
-
-    //Give the device a second before sending version request.
     QByteArray temp;
-    while(aPort.waitForReadyRead(1000))
-        temp = aPort.readAll();
-
-    aPort.write("vQ\r");            //get version string.
-
+    aPort.write(SerialMagellanConstants::Init);
     while (aPort.waitForReadyRead(1000))
         temp += aPort.readAll();
+    temp.clear();
+
+    aPort.write(SerialMagellanConstants::Version);
+    while (aPort.waitForReadyRead(1000))
+        temp += aPort.readAll();
+
     return QString(temp);
 }
 

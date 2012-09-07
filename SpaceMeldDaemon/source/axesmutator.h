@@ -40,6 +40,7 @@ public slots:
     void displacementIn(QVector<qint16> values);
 
 private:
+    qint16 sanitizeWin(qint16 value, int index);
     QVector<int> inverse;
     QVector<int> axesMap;
     QVector<float> sensitivity;

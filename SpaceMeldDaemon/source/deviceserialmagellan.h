@@ -29,7 +29,7 @@ namespace SerialMagellanConstants
     const char ModeDefault[] = "m3\r";
     const char ModeStatus[] = "mQ\r";
     const char ShortBeep[] = "b9\r";
-    const char InitString[] = "\rz\rz\r";
+    const char Init[] = "\rz\rz\r";
     const char Version[] = "vQ\r";
     const char KeyboardStatus[] = "kQ\r";
     const char ModeCompressed[] = "c33\r";

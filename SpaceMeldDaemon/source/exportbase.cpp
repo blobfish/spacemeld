@@ -18,6 +18,6 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include "exportbase.h"
 
 ExportBase::ExportBase(QObject *parent) :
-    QObject(parent)
+    QObject(parent), initializedTest(false)
 {
 }

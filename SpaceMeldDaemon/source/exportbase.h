@@ -20,16 +20,26 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QObject>
 
+//To do: if possible move initialize to private. as of right now, initialize is called
+// by the static instance function and doesn't need to be public.
+
+namespace Magellan
+{
+enum Commands {SetWindowCommand = 27695, ApplicationSensitivity, RingBell,
+                               ApplicationStarts, ModeChange, NullRadiusChange,
+                               ControlPanel, InternSendCommand};
+}
+
 class ExportBase : public QObject
 {
     Q_OBJECT
 public:
     explicit ExportBase(QObject *parent = 0);
     virtual bool initialize() = 0;
+    bool isInitialized(void){return initializedTest;}
     
-signals:
-    
-public slots:
+protected:
+    bool initializedTest;
     
 };
 

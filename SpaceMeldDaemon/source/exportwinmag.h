@@ -15,55 +15,49 @@ You should have received a copy of the GNU General Public License
 along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef EXPORTX11_H
-#define EXPORTX11_H
+#ifndef EXPORTWINMAG_H
+#define EXPORTWINMAG_H
 
-#include <qglobal.h>
-#include <QObject>
+#include <QList>
 #include <QVector>
 #include "exportbase.h"
 #include "deviceinfo.h"
 
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
+#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_WIN_MAG)
+#include <qt_windows.h>
 
+#define WIN_MAG_CLASS_NAME "MAGELLAN_3D_CONTROLLER"
+#define WIN_MAG_WINDOW_NAME "Magellan 3D Controller"
 
-class ExportX11 : public ExportBase
+class ExportWinMag : public ExportBase
 {
     Q_OBJECT
 public:
-    ~ExportX11();
     virtual bool initialize();
+    static ExportWinMag* instance();
+    void addWindow(HWND window){clients.push_back(window);}
     void setButtonMap(const DeviceInfo &info);
-    static int xError(Display *aDisplay, XErrorEvent *anError);
-    static int xInputOutputError(Display *aDisplay);
-    static ExportX11 *instance();
     
+    DWORD winEventMotion;
+    DWORD winEventButtonPress;
+    DWORD winEventButtonRelease;
+    DWORD winEventCommand;
+
 public slots:
     void displacementIn(QVector<qint16> values);
     void buttonIn(qint8 buttonNumber, bool buttonDown);
 
-private slots:
-    void xEventsIn();
-
 private:
-    explicit ExportX11(QObject *parent = 0);
-    void finish();
+    explicit ExportWinMag(QObject *parent = 0);
     void sendButtonMessage(qint8 buttonNumber, bool buttonDown);
     void sendKeyMessage(qint8 buttonNumber, bool buttonDown);
 
-    Display *display;
-    Window xWindow;
-    Atom xEventMotion;
-    Atom xEventButtonPress;
-    Atom xEventButtonRelease;
-    Atom xEventCommand;
-
-    QVector<Window> clients;
+    HINSTANCE hInstance;
+    HWND hwnd;
+    QList<HWND> clients;
     QMap<int, QString> buttonKeyMap;
 };
 
-#endif //Q_WS_X11
+#endif //Q_WS_WIN
 
-#endif // EXPORTX11_H
+#endif // EXPORTWINMAG_H

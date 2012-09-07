@@ -40,6 +40,14 @@ unix {
 }
 }
 
+contains(SPACE_MELD_CONFIG, USER_BUILD_EXPORT_WIN_MAG) {
+win32 {
+        DEFINES += SPACEMELD_BUILD_WIN_MAG
+        SOURCES += exportwinmag.cpp
+        HEADERS += exportwinmag.h
+        LIBS += -luser32 -lshell32 -lgdi32
+}
+}
 
 SOURCES += main.cpp \
     smdservice.cpp \
@@ -55,7 +63,8 @@ SOURCES += main.cpp \
     axesmutator.cpp \
     ../../SpaceMeldCommon/deviceconfig.cpp \
     ../../SpaceMeldCommon/deviceinfo.cpp \
-    ../../SpaceMeldCommon/knowndevices.cpp
+    ../../SpaceMeldCommon/knowndevices.cpp \
+    exportwinmag.cpp
 
 HEADERS += \
     smdservice.h \
@@ -71,4 +80,5 @@ HEADERS += \
     axesmutator.h \
     ../../SpaceMeldCommon/deviceconfig.h \
     ../../SpaceMeldCommon/deviceinfo.h \
-    ../../SpaceMeldCommon/knowndevices.h
+    ../../SpaceMeldCommon/knowndevices.h \
+    exportwinmag.h
