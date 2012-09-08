@@ -18,6 +18,13 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include "deviceserialmagellan.h"
 
 #include <QDebug>
+#include <QTimer>
+
+#define TIMEOUT 100
+
+//magellan plus xt on windows 7(AMD64)would not initialize correctly until I put the 100ms delay
+//between initialize sequence. It is possible that this may cause problems, as the launch
+//function returns true before the initialize sequence has ran.
 
 DeviceBase* createSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn)
 {
@@ -27,6 +34,13 @@ DeviceBase* createSerialMagellan(QObject *parent, const DeviceInfo &infoIn, cons
 DeviceSerialMagellan::DeviceSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn) :
     DeviceSerial(parent, infoIn, portInfoIn)
 {
+    sequence << SerialMagellanConstants::Init <<
+                SerialMagellanConstants::NullRadiusDefault <<
+                SerialMagellanConstants::SensitivityDefault <<
+                SerialMagellanConstants::PeriodDefault <<
+                SerialMagellanConstants::ModeDefault <<
+                SerialMagellanConstants::ModeCompressed <<
+                SerialMagellanConstants::ShortBeep;
 }
 
 bool DeviceSerialMagellan::launch()
@@ -35,9 +49,8 @@ bool DeviceSerialMagellan::launch()
         return false;
     if (!setPort(*port))
         return false;
-    if (!initialize())
-        return false;
     connect(port, SIGNAL(readyRead()), this, SLOT(readSlot()));
+    QTimer::singleShot(TIMEOUT, this, SLOT(initializeSlot()));
     return true;
 }
 
@@ -58,25 +71,6 @@ bool DeviceSerialMagellan::setPort(SerialPort &aPort)
     return true;
 }
 
-bool DeviceSerialMagellan::initialize()
-{
-    port->write(SerialMagellanConstants::Init);
-    port->write(SerialMagellanConstants::NullRadiusDefault);
-    port->write(SerialMagellanConstants::SensitivityDefault);
-    port->write(SerialMagellanConstants::PeriodDefault);
-    port->write(SerialMagellanConstants::ModeDefault);
-    port->write(SerialMagellanConstants::ModeCompressed);
-    port->write(SerialMagellanConstants::ShortBeep);
-
-    if (port->error() != SerialPort::NoError)
-    {
-        qDebug() << port->error() << ": in DeviceSerialMagellan::setUp";
-        return false;
-    }
-
-    return true;
-}
-
 QString DeviceSerialMagellan::versionString(SerialPort &aPort)
 {
     QByteArray temp;
@@ -90,6 +84,16 @@ QString DeviceSerialMagellan::versionString(SerialPort &aPort)
         temp += aPort.readAll();
 
     return QString(temp);
+}
+
+void DeviceSerialMagellan::initializeSlot()
+{
+    static int count = 0;
+    if (count == sequence.size())
+        return;
+    port->write(sequence.at(count));
+    count++;
+    QTimer::singleShot(TIMEOUT, this, SLOT(initializeSlot()));
 }
 
 void DeviceSerialMagellan::processPacket(const QByteArray &packet)

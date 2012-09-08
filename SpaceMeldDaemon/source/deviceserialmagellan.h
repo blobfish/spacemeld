@@ -63,12 +63,14 @@ public:
     static bool setPort(SerialPort &aPort);
     static QString versionString(SerialPort &aPort);
     friend DeviceBase* createSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
+private slots:
+    void initializeSlot();
 protected:
     explicit DeviceSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
     void processDisplacementPacket(const QByteArray &packet);
     void processButtonPacket(const QByteArray &packet);
 private:
-    bool initialize();
+    QVector<QByteArray> sequence;
 };
 
 DeviceBase* createSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
