@@ -114,7 +114,8 @@ void ExportX11::xEventsIn()
             if (event.xclient.data.s[2] == Magellan::SetWindowCommand)
             {
                 quint32 windowId = static_cast<quint32>((event.xclient.data.s[0] << 16) | event.xclient.data.s[1]);
-                clients.push_back(static_cast<Window>(windowId));
+                if (!clients.contains(windowId))
+                    clients.push_back(static_cast<Window>(windowId));
             }
         }
     }
