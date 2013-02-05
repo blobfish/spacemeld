@@ -120,8 +120,8 @@ void SMDService::start()
 
         //this is temp
 //        Monitor *monitor = new Monitor(qobject_cast<QCoreApplication *>(this->application()));
-//        QObject::connect(device, SIGNAL(displacementOut(QVector<qint16>)), monitor, SLOT(displacementSlot(QVector<qint16>)));
-//        QObject::connect(device, SIGNAL(buttonOut(qint8, bool)), monitor, SLOT(buttonSlot(qint8, bool)));
+//        QObject::connect(detectedDevices.front(), SIGNAL(displacementOut(QVector<qint16>)), monitor, SLOT(displacementSlot(QVector<qint16>)));
+//        QObject::connect(detectedDevices.front(), SIGNAL(buttonOut(qint8, bool)), monitor, SLOT(buttonSlot(qint8, bool)));
 
     settings.setValue(SERVICE_STATUS_STRING, true);
 }
