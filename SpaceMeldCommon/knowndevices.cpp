@@ -72,6 +72,10 @@ void KnownDevices::createKnownList()
     // I'd like to use FreeCAD with an older device labled 'Plus XT seriell' on the bottom.
     // It identifies as 'v MAGELLAN Version 6.80 3Dconnexion GmbH 25/09/03'.
 
+    //from tehrasha on spnav mailing list.
+    //Just acquired an IBM branded 'Magellan XT' from the LogiCAD era.
+    //MAGELLAN Version 6.50 by LogiCad3D GmbH 05/11/00
+
     //spaceball 4000 flx
     DeviceInfo temp;
     temp.modelId = SpaceModelType::BALL_4000FLX;
