@@ -26,12 +26,12 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 //between initialize sequence. It is possible that this may cause problems, as the launch
 //function returns true before the initialize sequence has ran.
 
-DeviceBase* createSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn)
+DeviceBase* createSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn)
 {
     return new DeviceSerialMagellan(parent, infoIn, portInfoIn);
 }
 
-DeviceSerialMagellan::DeviceSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn) :
+DeviceSerialMagellan::DeviceSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn) :
     DeviceSerial(parent, infoIn, portInfoIn)
 {
     sequence << SerialMagellanConstants::Init <<
@@ -54,24 +54,24 @@ bool DeviceSerialMagellan::launch()
     return true;
 }
 
-bool DeviceSerialMagellan::setPort(SerialPort &aPort)
+bool DeviceSerialMagellan::setPort(QSerialPort &aPort)
 {
-    aPort.setRate(SerialPort::Rate9600);
-    aPort.setDataBits(SerialPort::Data8);
-    aPort.setStopBits(SerialPort::TwoStop);
-    aPort.setFlowControl(SerialPort::HardwareControl);
-    aPort.setParity(SerialPort::NoParity);
+    aPort.setBaudRate(QSerialPort::Baud9600);
+    aPort.setDataBits(QSerialPort::Data8);
+    aPort.setStopBits(QSerialPort::TwoStop);
+    aPort.setFlowControl(QSerialPort::HardwareControl);
+    aPort.setParity(QSerialPort::NoParity);
 
-    aPort.setDtr(true);
-    aPort.setRts(true);
+    aPort.setDataTerminalReady(true);
+    aPort.setRequestToSend(true);
 
-    if (aPort.error() != SerialPort::NoError)
+    if (aPort.error() != QSerialPort::NoError)
         return false;
 
     return true;
 }
 
-QString DeviceSerialMagellan::versionString(SerialPort &aPort)
+QString DeviceSerialMagellan::versionString(QSerialPort &aPort)
 {
     QByteArray temp;
     aPort.write(SerialMagellanConstants::Init);

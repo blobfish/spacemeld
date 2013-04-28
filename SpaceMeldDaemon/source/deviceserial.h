@@ -18,10 +18,8 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef DEVICESERIAL_H
 #define DEVICESERIAL_H
 
-#include <QtAddOnSerialPort/serialportinfo.h>
-#include <QtAddOnSerialPort/serialport.h>
-
-using namespace QtAddOn::SerialPort;
+#include <QtSerialPort/qserialportinfo.h>
+#include <QtSerialPort/qserialport.h>
 
 #include "devicebase.h"
 
@@ -31,10 +29,10 @@ class DeviceSerial : public DeviceBase
 protected slots:
     void readSlot();
 protected:
-    explicit DeviceSerial(QObject *parent, const DeviceInfo &deviceInfoIn, const SerialPortInfo &portInfoIn);
+    explicit DeviceSerial(QObject *parent, const DeviceInfo &deviceInfoIn, const QSerialPortInfo &portInfoIn);
     virtual void processPacket(const QByteArray &packet) = 0;
-    SerialPortInfo portInfo;
-    SerialPort *port;
+    QSerialPortInfo portInfo;
+    QSerialPort *port;
 };
 
 #endif // DEVICESERIAL_H

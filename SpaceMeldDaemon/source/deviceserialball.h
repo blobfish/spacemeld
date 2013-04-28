@@ -26,16 +26,16 @@ class DeviceSerialBall : public DeviceSerial
 public:
     virtual bool launch();
     virtual void processPacket(const QByteArray &packet);
-    static bool setPort(SerialPort &aPort);
-    static QString versionString(SerialPort &aPort);
-    friend DeviceBase* createSerialBall(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
+    static bool setPort(QSerialPort &aPort);
+    static QString versionString(QSerialPort &aPort);
+    friend DeviceBase* createSerialBall(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn);
 protected:
-    explicit DeviceSerialBall(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
+    explicit DeviceSerialBall(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn);
     QByteArray cleanseEscape(QByteArray packet);
 private:
     bool initialize();
 };
 
-DeviceBase* createSerialBall(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
+DeviceBase* createSerialBall(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn);
 
 #endif // DEVICESERIALBALL_H

@@ -25,8 +25,6 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDebug>
 
-using namespace QtAddOn::SerialPort;
-
 InterfaceSerial::InterfaceSerial(QObject *parent, bool enabledIn) :
     InterfaceBase(parent, enabledIn)
 {
@@ -46,14 +44,14 @@ void InterfaceSerial::setupMap()
 void InterfaceSerial::detect()
 {
 //    dumpPortInfo();
-    QList<SerialPortInfo> ports = SerialPortInfo::availablePorts();
-    SerialPortInfo current;
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    QSerialPortInfo current;
 
     statStream << endl << "Serial Interface:";
     foreach(current, ports)
     {
         statStream << endl << "port: " << current.systemLocation() << endl;
-        SerialPort aPort(current);
+        QSerialPort aPort(current);
 
         //look for space ball.
         statStream << "   ball:" << endl;
@@ -89,7 +87,7 @@ void InterfaceSerial::detect()
     qDebug() << stats;
 }
 
-bool InterfaceSerial::detectBall(SerialPort &aPort, const SerialPortInfo &info)
+bool InterfaceSerial::detectBall(QSerialPort &aPort, const QSerialPortInfo &info)
 {
     DeviceSerialBall::setPort(aPort);
     QString version = DeviceSerialBall::versionString(aPort);
@@ -114,7 +112,7 @@ bool InterfaceSerial::detectBall(SerialPort &aPort, const SerialPortInfo &info)
     return false;
 }
 
-bool InterfaceSerial::detectMagellan(SerialPort &aPort, const SerialPortInfo &info)
+bool InterfaceSerial::detectMagellan(QSerialPort &aPort, const QSerialPortInfo &info)
 {
     DeviceSerialMagellan::setPort(aPort);
     QString version = DeviceSerialMagellan::versionString(aPort);
@@ -139,7 +137,7 @@ bool InterfaceSerial::detectMagellan(SerialPort &aPort, const SerialPortInfo &in
     return false;
 }
 
-DeviceBase* InterfaceSerial::createDevice(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn)
+DeviceBase* InterfaceSerial::createDevice(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn)
 {
     if (deviceMap.contains(infoIn.modelId))
         return (*(deviceMap.value(infoIn.modelId)))(parent, infoIn, portInfoIn);
@@ -150,8 +148,8 @@ DeviceBase* InterfaceSerial::createDevice(QObject *parent, const DeviceInfo &inf
 void InterfaceSerial::dumpPortInfo()
 {
     //system location: i.e. /dev/ttyS0
-    QList<SerialPortInfo> ports = SerialPortInfo::availablePorts();
-    SerialPortInfo current;
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    QSerialPortInfo current;
     foreach(current, ports)
     {
         qDebug() << (current.isBusy() ? "port is busy" : "port is not busy");
@@ -160,7 +158,7 @@ void InterfaceSerial::dumpPortInfo()
         qDebug() << "manufacturer is: " << current.manufacturer();
         qDebug() << "port name is: " << current.portName();
         qDebug() << "product identifier is: " << current.productIdentifier();
-        qDebug() << "standard rates: " << current.standardRates();
+        qDebug() << "standard rates: " << current.standardBaudRates();
         qDebug() << "system location is: " << current.systemLocation();
         qDebug() << "vendor identifier is: " << current.vendorIdentifier();
         qDebug();

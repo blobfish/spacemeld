@@ -27,10 +27,10 @@ public:
     virtual bool launch();
     virtual void processPacket(const QByteArray &packet);
     friend DeviceBase* createSerialBall4000FLX(QObject *parent, const DeviceInfo &infoIn,
-                                               const SerialPortInfo &portInfoIn);
+                                               const QSerialPortInfo &portInfoIn);
 
 protected:
-    explicit DeviceSerialBall4000FLX(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
+    explicit DeviceSerialBall4000FLX(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn);
     void processDisplacementPacket(const QByteArray &packet);
     void processButtonPacket(const QByteArray &packet);
 
@@ -39,6 +39,6 @@ private:
 
 };
 
-DeviceBase* createSerialBall4000FLX(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
+DeviceBase* createSerialBall4000FLX(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn);
 
 #endif // DEVICESERIALBALL4000FLX_H

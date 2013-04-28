@@ -19,12 +19,12 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDebug>
 
-DeviceBase* createSerialBall(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn)
+DeviceBase* createSerialBall(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn)
 {
     return new DeviceSerialBall(parent, infoIn, portInfoIn);
 }
 
-DeviceSerialBall::DeviceSerialBall(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn) :
+DeviceSerialBall::DeviceSerialBall(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn) :
     DeviceSerial(parent, infoIn, portInfoIn)
 {
 }
@@ -42,18 +42,18 @@ bool DeviceSerialBall::launch()
     return true;
 }
 
-bool DeviceSerialBall::setPort(SerialPort &aPort)
+bool DeviceSerialBall::setPort(QSerialPort &aPort)
 {
-    aPort.setRate(SerialPort::Rate9600);
-    aPort.setFlowControl(SerialPort::SoftwareControl);
-    aPort.setDataBits(SerialPort::Data8);
-    aPort.setStopBits(SerialPort::OneStop);
-    aPort.setParity(SerialPort::NoParity);
+    aPort.setBaudRate(QSerialPort::Baud9600);
+    aPort.setFlowControl(QSerialPort::SoftwareControl);
+    aPort.setDataBits(QSerialPort::Data8);
+    aPort.setStopBits(QSerialPort::OneStop);
+    aPort.setParity(QSerialPort::NoParity);
 
-    aPort.setRts(true);
-    aPort.setDtr(true);
+    aPort.setRequestToSend(true);
+    aPort.setDataTerminalReady(true);
 
-    if (aPort.error() != SerialPort::NoError)
+    if (aPort.error() != QSerialPort::NoError)
         return false;
     return true;
 }
@@ -68,7 +68,7 @@ bool DeviceSerialBall::initialize()
     port->write("M\rYC\rAD\rBcCcC\r");
 
 
-    if (port->error() != SerialPort::NoError)
+    if (port->error() != QSerialPort::NoError)
     {
         qDebug() << port->error() << ": in DeviceSerialBall::initialize";
         return false;
@@ -77,7 +77,7 @@ bool DeviceSerialBall::initialize()
     return true;
 }
 
-QString DeviceSerialBall::versionString(SerialPort &aPort)
+QString DeviceSerialBall::versionString(QSerialPort &aPort)
 {
     //if this isn't broken, don't fix it!
 

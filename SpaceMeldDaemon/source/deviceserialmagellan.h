@@ -60,19 +60,19 @@ class DeviceSerialMagellan : public DeviceSerial
 public:
     virtual bool launch();
     virtual void processPacket(const QByteArray &packet);
-    static bool setPort(SerialPort &aPort);
-    static QString versionString(SerialPort &aPort);
-    friend DeviceBase* createSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
+    static bool setPort(QSerialPort &aPort);
+    static QString versionString(QSerialPort &aPort);
+    friend DeviceBase* createSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn);
 private slots:
     void initializeSlot();
 protected:
-    explicit DeviceSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
+    explicit DeviceSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn);
     void processDisplacementPacket(const QByteArray &packet);
     void processButtonPacket(const QByteArray &packet);
 private:
     QVector<QByteArray> sequence;
 };
 
-DeviceBase* createSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn);
+DeviceBase* createSerialMagellan(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn);
 
 #endif // DEVICESERIALMAGELLAN_H

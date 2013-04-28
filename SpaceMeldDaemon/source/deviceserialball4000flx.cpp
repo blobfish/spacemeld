@@ -19,13 +19,13 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDebug>
 
-DeviceBase* createSerialBall4000FLX(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn)
+DeviceBase* createSerialBall4000FLX(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn)
 {
     return new DeviceSerialBall4000FLX(parent, infoIn, portInfoIn);
 }
 
 DeviceSerialBall4000FLX::DeviceSerialBall4000FLX
-(QObject *parent, const DeviceInfo &infoIn, const SerialPortInfo &portInfoIn) : DeviceSerialBall(parent, infoIn, portInfoIn)
+(QObject *parent, const DeviceInfo &infoIn, const QSerialPortInfo &portInfoIn) : DeviceSerialBall(parent, infoIn, portInfoIn)
 {
 
 }
@@ -52,7 +52,7 @@ bool DeviceSerialBall4000FLX::initialize()
     // BcCcC is a patterned beep.
     port->write("M\rYC\rAD\rBcCcC\r");
 
-    if (port->error() != SerialPort::NoError)
+    if (port->error() != QSerialPort::NoError)
     {
         qDebug() << port->error() << ": in DeviceSerialBall::initialize";
         return false;

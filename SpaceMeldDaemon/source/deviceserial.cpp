@@ -19,12 +19,10 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDebug>
 
-using namespace QtAddOn::SerialPort;
-
-DeviceSerial::DeviceSerial(QObject *parent, const DeviceInfo &deviceInfoIn, const SerialPortInfo &portInfoIn) :
+DeviceSerial::DeviceSerial(QObject *parent, const DeviceInfo &deviceInfoIn, const QSerialPortInfo &portInfoIn) :
     DeviceBase(parent, deviceInfoIn), portInfo(portInfoIn)
 {
-    port = new SerialPort(portInfo, this);
+    port = new QSerialPort(portInfo, this);
 }
 
 void DeviceSerial::readSlot()

@@ -20,12 +20,12 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QTextStream>
 #include <QMap>
-#include <QtAddOnSerialPort/serialportinfo.h>
-#include <QtAddOnSerialPort/serialport.h>
+#include <QtSerialPort/qserialportinfo.h>
+#include <QtSerialPort/qserialport.h>
 #include "interfacebase.h"
 
 typedef DeviceBase* (*createFunction)(QObject *parent, const DeviceInfo &infoIn,
-                                      const QtAddOn::SerialPort::SerialPortInfo &portInfoIn);
+                                      const QSerialPortInfo &portInfoIn);
 
 typedef QMap<SpaceModelType::SpaceModel, createFunction> DeviceMap;
 
@@ -38,10 +38,10 @@ private:
     void dumpPortInfo();
     void setupMap();
     void detect();
-    bool detectBall(QtAddOn::SerialPort::SerialPort &aPort, const QtAddOn::SerialPort::SerialPortInfo &info);
-    bool detectMagellan(QtAddOn::SerialPort::SerialPort &aPort, const QtAddOn::SerialPort::SerialPortInfo &info);
+    bool detectBall(QSerialPort &aPort, const QSerialPortInfo &info);
+    bool detectMagellan(QSerialPort &aPort, const QSerialPortInfo &info);
     DeviceBase* createDevice(QObject *parent, const DeviceInfo &infoIn,
-                             const QtAddOn::SerialPort::SerialPortInfo &portInfoIn);
+                             const QSerialPortInfo &portInfoIn);
 
     QString stats;
     QTextStream statStream;
