@@ -1,0 +1,30 @@
+Requirements.
+  qt4.8.1 or higher. tested on 4.8.1 and 4.8.3. Might work on earlier versions, need testing.
+  qtsolutions: as of 10/29/2012, this can be found at http://qt.gitorious.org/qt-solutions
+    This is a source only library. No building and installing.
+  QSerialDevice: as of 10/29/2012, this can be found at http://qt.gitorious.org/qtplayground/qtserialport
+    I believe Qt5 will include QSerialDevice by default. For Qt4 it must be built and installed.
+    I needed libudev-dev to build QSerialDevice.
+    
+SpaceMeld building:
+  qmake SpaceMeldDaemon.pro "SOLUTIONS_ROOT = path to the root directory of qt-solutions"
+    i.e.   qmake SpaceMeldDaemon.pro "SOLUTIONS_ROOT = /home/user/development/qt-solutions"
+  make or nmake
+  qmake SpaceMeldController.pro "SOLUTIONS_ROOT = path to the root directory of qt-solutions"
+  make or nmake
+  //haven't done install on anything yet.
+  
+Known limitations and bugs.
+  Couldn't generate key strokes on windows for button mapping.
+  Only Serial devices at ths point.
+  
+basic testing has been done on:
+  Kubuntu 12.04 amd64 and 12.10 amd64.
+  windows 7 amd64.
+  
+devices tested:
+  spaceball 4000flx		Kubuntu 12.04 amd64	Kubuntu 12.10 amd64	Windows7 amd64
+  magellan classic		Kubuntu 12.04 amd64	Kubuntu 12.10 amd64	Windows7 amd64
+  magellan plus xt		Kubuntu 12.04 amd64	Kubuntu 12.10 amd64	Windows7 amd64
+    
+  
