@@ -1,18 +1,72 @@
 Requirements.
   qt4.8.1 or higher. tested on 4.8.1 and 4.8.3. Might work on earlier versions, need testing.
-  qtsolutions: as of 10/29/2012, this can be found at http://qt.gitorious.org/qt-solutions
+  qtsolutions: as of 10/29/2012, this can be found at http://qt.gitorious.org/qt-solutions. the
+    repository can be found at "git@gitorious.org:qt-solutions/qt-solutions.git".
     This is a source only library. No building and installing.
   QSerialDevice: as of 10/29/2012, this can be found at http://qt.gitorious.org/qtplayground/qtserialport
     I believe Qt5 will include QSerialDevice by default. For Qt4 it must be built and installed.
-    I needed libudev-dev to build QSerialDevice.
+    I needed libudev-dev to build QSerialDevice....... As of 08/01/2014, has been renamed to qserialport and
+    the repository has moved to "git://gitorious.org/qt/qtserialport.git". Build with 
+    "qmake ../qtserialport.pro" then "make" then "sudo make install"
     
-SpaceMeld building:
-  qmake SpaceMeldDaemon.pro "SOLUTIONS_ROOT = path to the root directory of qt-solutions"
-    i.e.   qmake SpaceMeldDaemon.pro "SOLUTIONS_ROOT = /home/user/development/qt-solutions"
-  make or nmake
-  qmake SpaceMeldController.pro "SOLUTIONS_ROOT = path to the root directory of qt-solutions"
-  make or nmake
-  //haven't done install on anything yet.
+    
+SpaceMeld building linux:
+  Daemon:
+    cd SpaceMeldDaemon
+    mkdir build
+    cd build
+    qmake ../source/SpaceMeldDaemon.pro "SOLUTIONS_ROOT = ../../../qt-solutions"
+    make
+    
+  Controller:
+    cd SpaceMeldController
+    mkdir build
+    cd build
+    qmake ../source/SpaceMeldController.pro "SOLUTIONS_ROOT = ../../../qt-solutions"
+    make
+    
+  Path for "SOLUTIONS_ROOT" should reflect the location of the qt solutions directory.
+  Haven't done anything for install yet. You can run from build directories.
+  
+  
+SpaceMeld operation (normal):
+  After a successful build of both the daemon and the controller, launch the controller with
+    "sudo SpaceMeldController" (or whatever to run with root priviledges). ALL normal interactions with the
+    driver should be through the controller application.
+  For the service path, browse to and select the SpaceMeldDaemon that should have been previously built.
+  In the device interfaces list box, select the serial entry and push the enable button to the right.
+    USB and joystick are not implemented at this point. All interfaces are disabled by default.
+  Push the install button to install the service/daemon.
+  Push the start button and the let the daemon initialize. After a few seconds any recognized devices will
+    be in the devices tab.
+  Switch to the devices tab.
+  Devices have to be enabled. In the upper pane, select the device and double click the cell in the enabled column to 
+    change to true.
+  Exports have to be enabled. In the lower left pane, select the appropriate export. double click the
+    appropriate cell and enable. As of 08/01/2014 only x11 and win are implemented. x11 for linux and win for windows.
+  Axis control can be modified in the lower middle pane. You can inverse the axis with checkboxes and control
+    the sensitivity with the scale numbers(.1 to 10). The output axes can be "dragged and dropped" to change mapping
+    from device axis to output axis. Changes in this pane should happen immediately when the device is enabled. see below.
+  You can map buttons to accelerator keys. In the lower right pane, double click in the appropriate cell and press key combo.
+    This currently doesn't work on windows.
+  Devices don't enter a functioning state until the driver is started with the device enabled. This means that after
+    first run of the controller and the device has been enabled, the driver needs to be restarted. Go back to 
+    the service tab and push stop(lower right) and then push start. After a few seconds the device should be ready.
+  Running the controller from the terminal is a great way to get extra information.
+  
+  
+SpaceMeld operation (debug/testing)
+  Sometimes operating the daemon through the controller can be cumbersome. You can
+    run the driver as a normal executable (not a daemon/service) with -e switch to
+    the daemon executable like, "./SpaceMeldDaemon -e". Then you can use "ctrl + c"
+    in the terminal to kill the driver. This works good for testing. Obviously
+    having the service running through the controller and then trying to run
+    as a normal executable with the -e switch, will cause problems.
+  
+  
+Settings file.
+  Because the controller and deamon run as root, the configuration file is difficult to find.
+  On kubuntu it is located at "/etc/xdg/Blobfish/SpaceMeld.conf"
   
 Known limitations and bugs.
   Couldn't generate key strokes on windows for button mapping.
@@ -23,8 +77,8 @@ basic testing has been done on:
   windows 7 amd64.
   
 devices tested:
-  spaceball 4000flx		Kubuntu 12.04 amd64	Kubuntu 12.10 amd64	Windows7 amd64
-  magellan classic		Kubuntu 12.04 amd64	Kubuntu 12.10 amd64	Windows7 amd64
-  magellan plus xt		Kubuntu 12.04 amd64	Kubuntu 12.10 amd64	Windows7 amd64
+  spaceball 4000flx		Kubuntu amd64(12.04, 12.10)				Windows7 amd64
+  magellan classic		Kubuntu amd64(12.04, 12.10)				Windows7 amd64
+  magellan plus xt		Kubuntu amd64(12.04, 12.10, 13.04, 13.10, 14.04)	Windows7 amd64
     
   
