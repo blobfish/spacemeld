@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<device>
+  <name>Magellan Plus XT</name>
+  <interface>serial</interface>
+  <matchKey>MAGELLAN  Version 6.60</matchKey>
+  <matchKey>MAGELLAN  Version 6.80</matchKey>
+  <maxDisplacement>512</maxDisplacement>
+  <buttonCount>10</buttonCount>
+</device>
