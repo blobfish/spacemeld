@@ -49,25 +49,21 @@ AxesMutator::AxesMutator(QObject *parent, OutputType::Output outputIn) :
     sensitivity.push_back(1.0);
 }
 
-
-void AxesMutator::displacementIn(QVector<qint16> values)
+qint16 AxesMutator::doMutate(qint16 valueIn, int index)
 {
-    if (values.size() != 6)
-        return;
+    return static_cast<qint16> (valueIn * inverse.at(index) * sensitivity.at(index));
+}
 
-    QVector<qint16> valuesOut;
-    valuesOut.reserve(6);
-    valuesOut.resize(6);
+void AxesMutator::displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5)
+{
+    a0 = doMutate(a0, 0); if(output == OutputType::WIN) a0 = sanitizeWin(a0, 0);
+    a1 = doMutate(a1, 1); if(output == OutputType::WIN) a1 = sanitizeWin(a1, 1);
+    a2 = doMutate(a2, 2); if(output == OutputType::WIN) a2 = sanitizeWin(a2, 2);
+    a3 = doMutate(a3, 3); if(output == OutputType::WIN) a3 = sanitizeWin(a3, 3);
+    a4 = doMutate(a4, 4); if(output == OutputType::WIN) a4 = sanitizeWin(a4, 4);
+    a5 = doMutate(a5, 5); if(output == OutputType::WIN) a5 = sanitizeWin(a5, 5);
 
-    for (int index(0); index < 6; ++index)
-    {
-        qint16 temp = static_cast<qint16> (values.at(index) * inverse.at(index) * sensitivity.at(index));
-        if (output == OutputType::WIN)
-            temp = sanitizeWin(temp, index);
-        valuesOut[axesMap.at(index)] = temp;
-    }
-
-    emit displacementOut(valuesOut);
+    emit displacementOut(a0, a1, a2, a3, a4, a5);
 }
 
 void AxesMutator::invertAxes(AxesMutator::Axis axis, bool signal)

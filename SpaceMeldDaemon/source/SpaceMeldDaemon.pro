@@ -31,9 +31,9 @@ TEMPLATE = app
 
 include(../../SpaceMeldCommon/spacemeld.pri)
 
-contains(SPACE_MELD_CONFIG, USER_BUILD_X11) {
+contains(SPACE_MELD_CONFIG, USER_BUILD_EXPORT_X11_MAG) {
 unix {
-        DEFINES += SPACEMELD_BUILD_X11
+        DEFINES += SPACEMELD_BUILD_EXPORT_X11_MAG
         SOURCES += exportx11.cpp
         HEADERS += exportx11.h
         LIBS += -lX11
@@ -42,11 +42,18 @@ unix {
 
 contains(SPACE_MELD_CONFIG, USER_BUILD_EXPORT_WIN_MAG) {
 win32 {
-        DEFINES += SPACEMELD_BUILD_WIN_MAG
+        DEFINES += SPACEMELD_BUILD_EXPORT_WIN_MAG
         SOURCES += exportwinmag.cpp
         HEADERS += exportwinmag.h
         LIBS += -luser32 -lshell32 -lgdi32
 }
+}
+
+contains(SPACE_MELD_CONFIG, USER_BUILD_EXPORT_DBUS) {
+        DEFINES += SPACEMELD_BUILD_EXPORT_DBUS
+        SOURCES += exportdbus.cpp dbusbaseserver.cpp
+        HEADERS += exportdbus.h dbusbaseserver.h
+        CONFIG += qdbus
 }
 
 SOURCES += main.cpp \
@@ -63,8 +70,7 @@ SOURCES += main.cpp \
     axesmutator.cpp \
     ../../SpaceMeldCommon/deviceconfig.cpp \
     ../../SpaceMeldCommon/deviceinfo.cpp \
-    ../../SpaceMeldCommon/knowndevices.cpp \
-    exportwinmag.cpp
+    ../../SpaceMeldCommon/knowndevices.cpp
 
 HEADERS += \
     smdservice.h \
@@ -80,5 +86,4 @@ HEADERS += \
     axesmutator.h \
     ../../SpaceMeldCommon/deviceconfig.h \
     ../../SpaceMeldCommon/deviceinfo.h \
-    ../../SpaceMeldCommon/knowndevices.h \
-    exportwinmag.h
+    ../../SpaceMeldCommon/knowndevices.h

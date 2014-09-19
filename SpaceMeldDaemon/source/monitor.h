@@ -30,7 +30,7 @@ public:
 signals:
     
 public slots:
-    void displacementSlot(QVector<qint16> values);
+    void displacementSlot(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5);
     void buttonSlot(qint8 buttonNumber, bool buttonDown);
 };
 

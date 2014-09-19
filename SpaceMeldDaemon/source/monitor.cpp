@@ -24,9 +24,9 @@ Monitor::Monitor(QObject *parent) :
 {
 }
 
-void Monitor::displacementSlot(QVector<qint16> values)
+void Monitor::displacementSlot(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5)
 {
-    qDebug() << "Displacement: " << values;
+    qDebug() << "Displacement: " << a0 <<  a1 <<  a2 << a3 << a4 << a5;
 }
 
 void Monitor::buttonSlot(qint8 buttonNumber, bool buttonDown)

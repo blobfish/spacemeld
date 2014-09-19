@@ -15,7 +15,7 @@ SpaceMeld building linux:
     cd SpaceMeldDaemon
     mkdir build
     cd build
-    qmake ../source/SpaceMeldDaemon.pro "SOLUTIONS_ROOT = ../../../qt-solutions"
+    qmake ../source/SpaceMeldDaemon.pro "SOLUTIONS_ROOT = ../../../../../QtSolutions/qt-solutions" QMAKE_CXXFLAGS+=-std=gnu++11
     make
     
   Controller:
@@ -82,3 +82,27 @@ devices tested:
   magellan plus xt		Kubuntu amd64(12.04, 12.10, 13.04, 13.10, 14.04)	Windows7 amd64
     
   
+DBus
+I had to create a config file for adding to the system bus. On kubuntu 14.04 it was located at
+"/etc/dbus-1/system.d/org.spacemeld.conf". guessing filename has to match service name registered.
+contents of that file:
+
+<!DOCTYPE busconfig PUBLIC
+ "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+<busconfig>
+  <!-- Only user root can own spacemeld -->
+  <policy user="root">
+    <allow own="org.spacemeld"/>
+  </policy>
+
+  <!-- Allow anyone to call into the service - we'll reject callers using PolicyKit -->
+  <policy context="default">
+    <allow send_interface="org.spacemeld"/>
+    <allow receive_sender="org.spacemeld"/>
+    <allow receive_interface="org.spacemeld"/>
+  </policy>
+</busconfig>
+
+Above file contents are the results of the first successful test on the system bus.
+Contents have evolved as needed. Don't use this content as long as this note exist.

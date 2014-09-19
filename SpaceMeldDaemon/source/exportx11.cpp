@@ -20,7 +20,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDebug>
 #include <QCoreApplication>
 
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
+#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
 
 #include "exportx11.h"
 #include <X11/keysym.h>
@@ -121,15 +121,9 @@ void ExportX11::xEventsIn()
     }
 }
 
-void ExportX11::displacementIn(QVector<qint16> values)
+void ExportX11::displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5)
 {
 //    qDebug() << "Displacement: " << values;
-
-    if (values.size() != 6)
-    {
-        qDebug() << "wrong count on values. ExportX11::displacementIn";
-        return;
-    }
 
     XEvent event;
     event.type = ClientMessage;
@@ -139,8 +133,12 @@ void ExportX11::displacementIn(QVector<qint16> values)
     event.xclient.format = 16;
     event.xclient.data.s[0] = event.xclient.data.s[1] = 0;
 
-    for (int index(0); index < 6; ++index)
-        event.xclient.data.s[index + 2] = values.at(index);
+    event.xclient.data.s[2] = a0;
+    event.xclient.data.s[3] = a1;
+    event.xclient.data.s[4] = a2;
+    event.xclient.data.s[5] = a3;
+    event.xclient.data.s[6] = a4;
+    event.xclient.data.s[7] = a5;
 
     QVector<Window>::iterator it;
     for (it = clients.begin(); it != clients.end(); ++it)

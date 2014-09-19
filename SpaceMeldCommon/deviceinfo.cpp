@@ -267,3 +267,19 @@ void ExportInfo::writeSettings(QSettings &settings) const
     }
     settings.endArray();
 }
+
+QString DeviceInfo::getDBUSName() const
+{
+    //cant have any / in the dbus name.
+    QString tempPath = path;
+    tempPath.replace("/", "_");
+
+    //can't have any spaces in the dbus name.
+    QString tempName = modelName;
+    tempName.replace(" ", "_");
+
+    QString out;
+    QTextStream stream(&out);
+    stream << tempName << "_" << ConnectionInterfaceType::getString(interfaceId) << "_" << tempPath;
+    return out;
+}

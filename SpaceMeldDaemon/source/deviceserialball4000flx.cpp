@@ -87,7 +87,7 @@ void DeviceSerialBall4000FLX::processDisplacementPacket(const QByteArray &packet
         values.push_back(temp);
     }
 
-    emit displacementOut(values);
+    emit displacementOut(values[0], values[1], values[2], values[3], values[4], values[5]);
 }
 
 void DeviceSerialBall4000FLX::processButtonPacket(const QByteArray &packet)

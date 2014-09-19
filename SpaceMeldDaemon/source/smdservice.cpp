@@ -25,6 +25,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include "smdservice.h"
 #include "exportx11.h"
 #include "exportwinmag.h"
+#include "exportdbus.h"
 #include "monitor.h"
 #include "axesmutator.h"
 
@@ -32,7 +33,6 @@ SMDService::SMDService(int argc, char **argv) :
     QtService<QCoreApplication>(argc, argv, SERVICE_NAME_STRING)
 {
     setServiceDescription("Driver for space mice.");
-    qRegisterMetaType<QVector<qint16> >("QVector<qint16>");
 
     QSettings settings(QSettings::SystemScope, ORG_NAME_STRING, APP_NAME_STRING);
     settings.setValue(SERVICE_STATUS_STRING, false);
@@ -81,7 +81,7 @@ void SMDService::start()
             if (currentDevice->launch())
             {
                 qDebug() << currentDevice->info().modelName << " is ready";
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
+#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
                 if (currentDevice->info().exports.at(OutputType::X11).enabled)
                 {
                     ExportX11 *x11 = ExportX11::instance();
@@ -89,15 +89,17 @@ void SMDService::start()
                     AxesMutator *mutate = new AxesMutator(currentDevice, OutputType::X11);
                     mutate->setObjectName("axesMutator");
                     mutate->setConfig(currentDevice->info());
-                    QObject::connect(currentDevice, SIGNAL(displacementOut(QVector<qint16>)), mutate, SLOT(displacementIn(QVector<qint16>)));
+                    QObject::connect(currentDevice, SIGNAL(displacementOut(qint16, qint16, qint16, qint16, qint16, qint16)),
+                                     mutate, SLOT(displacementIn(qint16, qint16, qint16, qint16, qint16, qint16)));
                     x11->setButtonMap(currentDevice->info());
 
-                    QObject::connect(mutate, SIGNAL(displacementOut(QVector<qint16>)), x11, SLOT(displacementIn(QVector<qint16>)));
+                    QObject::connect(mutate, SIGNAL(displacementOut(qint16, qint16, qint16, qint16, qint16, qint16)),
+                                     x11, SLOT(displacementIn(qint16, qint16, qint16, qint16, qint16, qint16)));
                     QObject::connect(currentDevice, SIGNAL(buttonOut(qint8, bool)), x11, SLOT(buttonIn(qint8, bool)));
 
                 }
 #endif //Q_WS_X11
-#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_WIN_MAG)
+#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
                 if (currentDevice->info().exports.at(OutputType::WIN).enabled)
                 {
                     ExportWinMag *winMag = ExportWinMag::instance();
@@ -105,22 +107,34 @@ void SMDService::start()
                     AxesMutator *mutate = new AxesMutator(currentDevice, OutputType::WIN);
                     mutate->setObjectName("axesMutator");
                     mutate->setConfig(currentDevice->info());
-                    QObject::connect(currentDevice, SIGNAL(displacementOut(QVector<qint16>)), mutate, SLOT(displacementIn(QVector<qint16>)));
+                    QObject::connect(currentDevice, SIGNAL(displacementOut(qint16, qint16, qint16, qint16, qint16, qint16)),
+                                     mutate, SLOT(displacementIn(qint16, qint16, qint16, qint16, qint16, qint16)));
                     winMag->setButtonMap(currentDevice->info());
 
-                    QObject::connect(mutate, SIGNAL(displacementOut(QVector<qint16>)), winMag, SLOT(displacementIn(QVector<qint16>)));
+                    QObject::connect(mutate, SIGNAL(displacementOut(qint16, qint16, qint16, qint16, qint16, qint16)),
+                                     winMag, SLOT(displacementIn(qint16, qint16, qint16, qint16, qint16, qint16)));
                     QObject::connect(currentDevice, SIGNAL(buttonOut(qint8,bool)), winMag, SLOT(buttonIn(qint8,bool)));
                 }
 #endif //Q_WS_WIN
+#if defined(SPACEMELD_BUILD_EXPORT_DBUS)
+                if (currentDevice->info().exports.at(OutputType::DBUS).enabled)
+                {
+                    //need to test multiple devices for export dbus.
+                    ExportDBus *dbusServer = ExportDBus::instance();
+                    currentDevice->exportToDBus();
+                }
+#endif //SPACEMELD_BUILD_EXPORT_DBUS
             }
             else
                 qDebug() << currentDevice->info().modelName << " launch FAILED";
         }
     }
 
+
         //this is temp
 //        Monitor *monitor = new Monitor(qobject_cast<QCoreApplication *>(this->application()));
-//        QObject::connect(detectedDevices.front(), SIGNAL(displacementOut(QVector<qint16>)), monitor, SLOT(displacementSlot(QVector<qint16>)));
+//        QObject::connect(detectedDevices.front(), SIGNAL(displacementOut(qint16, qint16, qint16, qint16, qint16, qint16)),
+//                          monitor, SLOT(displacementSlot(qint16, qint16, qint16, qint16, qint16, qint16)));
 //        QObject::connect(detectedDevices.front(), SIGNAL(buttonOut(qint8, bool)), monitor, SLOT(buttonSlot(qint8, bool)));
 
     settings.setValue(SERVICE_STATUS_STRING, true);
@@ -251,7 +265,7 @@ void SMDService::loadButtonMap(int deviceId)
     if ((!device->info().detected) || device->info().exports.at(OutputType::DBUS).enabled)
         return;
 
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
+#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
     if (device->info().exports.at(OutputType::X11).enabled)
     {
         DeviceInfos infos = DeviceConfig::readConfiguredDevices();

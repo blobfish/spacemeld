@@ -34,13 +34,14 @@ public:
     void setConfig(const DeviceInfo &info);
     
 signals:
-    void displacementOut(QVector<qint16> values);
+    void displacementOut(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5);
     
 public slots:
-    void displacementIn(QVector<qint16> values);
+    void displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5);
 
 private:
     qint16 sanitizeWin(qint16 value, int index);
+    qint16 doMutate(qint16 valueIn, int index);
     QVector<int> inverse;
     QVector<int> axesMap;
     QVector<float> sensitivity;

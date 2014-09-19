@@ -35,6 +35,7 @@ class ExportBase : public QObject
     Q_OBJECT
 public:
     explicit ExportBase(QObject *parent = 0);
+    virtual ~ExportBase(){}
     virtual bool initialize() = 0;
     bool isInitialized(void){return initializedTest;}
     

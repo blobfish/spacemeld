@@ -67,6 +67,7 @@ void KnownDevices::createKnownList()
 {
     //this might be read from a config/xml file someday.
     //need to verify max displacement numbers.
+    //DBus doesn't like spaces, so model name doesn't contain spaces.
 
     //from shoogen on freecad list.
     // I'd like to use FreeCAD with an older device labled 'Plus XT seriell' on the bottom.

@@ -18,7 +18,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include <QCoreApplication>
 #include <QDebug>
 
-#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_WIN_MAG)
+#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
 #include "exportwinmag.h"
 
 static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -155,13 +155,13 @@ void ExportWinMag::setButtonMap(const DeviceInfo &info)
     buttonKeyMap = info.exports.at(static_cast<int>(OutputType::WIN)).buttonKeyMap;
 }
 
-void ExportWinMag::displacementIn(QVector<qint16> values)
+void ExportWinMag::displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5)
 {
     DWORD translations = 0;
-    translations = (values.at(0) & 0x07FF | (values.at(1) & 0x07FF) << 11 | (values.at(2) & 0x03FF) << 22);
+    translations = (a0 & 0x07FF | (a1 & 0x07FF) << 11 | (a2 & 0x03FF) << 22);
 
     DWORD rotations = 0;
-    rotations = (values.at(3) & 0x07FF |(values.at(4) & 0x07FF) << 11 | (values.at(5) & 0x03FF) << 22);
+    rotations = (a3 & 0x07FF | (a4 & 0x07FF) << 11 | (a5 & 0x03FF) << 22);
 
     QList<HWND>::Iterator it;
     for (it = clients.begin(); it != clients.end();)

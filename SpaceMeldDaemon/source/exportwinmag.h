@@ -23,7 +23,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include "exportbase.h"
 #include "deviceinfo.h"
 
-#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_WIN_MAG)
+#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
 #include <qt_windows.h>
 
 #define WIN_MAG_CLASS_NAME "MAGELLAN_3D_CONTROLLER"
@@ -33,6 +33,7 @@ class ExportWinMag : public ExportBase
 {
     Q_OBJECT
 public:
+    virtual ~ExportWinMag(){}
     virtual bool initialize();
     static ExportWinMag* instance();
     void addWindow(HWND window){clients.push_back(window);}
@@ -44,7 +45,7 @@ public:
     DWORD winEventCommand;
 
 public slots:
-    void displacementIn(QVector<qint16> values);
+    void displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5);
     void buttonIn(qint8 buttonNumber, bool buttonDown);
 
 private:

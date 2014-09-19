@@ -22,20 +22,42 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include <QVector>
 #include "deviceinfo.h"
 
+#ifdef SPACEMELD_BUILD_EXPORT_DBUS
+#include <QtDBus/QDBusConnection>
+#endif
+
 class DeviceBase : public QObject
 {
     Q_OBJECT
 public:
     DeviceInfo& info(){return deviceInfo;}
     virtual bool launch(){return false;}
+    virtual bool exportToDBus();
+
+public slots:
+    //dbus exported.
+    uchar getButtonCount();
+    QString getDeviceName();
+    QString getInterfaceName();
+    QString getPath();
 
 protected:
     explicit DeviceBase(QObject *parent, const DeviceInfo &infoIn);
     DeviceInfo deviceInfo;
 
+protected slots:
+    void displacementDBusConversion(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5);
+    void buttonDBusConversion(qint8 buttonNumber, bool buttonDown);
+
 signals:
-    void displacementOut(QVector<qint16> values);
+    void displacementOut(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5);
     void buttonOut(qint8 buttonNumber, bool buttonDown);
+
+    //in order for qdbusabstractadaptor autorelaysignals to work the function prototypes
+    //have to match exactly. So I can either allow the dbus to force types throughout
+    //app or create an extra set of signals for dbus. I chose the latter and the following are for dbus.
+    void displacement(short axis0, short axis1, short axis2, short axis3, short axis4, short axis5);
+    void button(uchar buttonNumber, bool buttonDown);
 };
 
 typedef QVector<DeviceBase *> Devices;

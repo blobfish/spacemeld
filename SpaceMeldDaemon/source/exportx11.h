@@ -24,7 +24,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include "exportbase.h"
 #include "deviceinfo.h"
 
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_X11)
+#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
@@ -33,7 +33,7 @@ class ExportX11 : public ExportBase
 {
     Q_OBJECT
 public:
-    ~ExportX11();
+    virtual ~ExportX11();
     virtual bool initialize();
     void setButtonMap(const DeviceInfo &info);
     static int xError(Display *aDisplay, XErrorEvent *anError);
@@ -41,7 +41,7 @@ public:
     static ExportX11 *instance();
     
 public slots:
-    void displacementIn(QVector<qint16> values);
+    void displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5);
     void buttonIn(qint8 buttonNumber, bool buttonDown);
 
 private slots:

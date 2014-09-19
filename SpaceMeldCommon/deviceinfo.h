@@ -28,6 +28,7 @@ namespace SpaceModelType
 {
 enum SpaceModel {UNKNOWN, BALL_1003, BALL_2003B, BALL_2003C, BALL_3003C, BALL_4000FLX, BALL_5000FLX,
                  MOUSE_CLASSIC, MOUSE_PLUS, MOUSE_PLUS_XT};
+//strings related to this enum is provided from the knowndevices interface.
 }
 
 namespace ConnectionInterfaceType
@@ -80,6 +81,7 @@ public:
     void clear();
     bool isEqual(const DeviceInfo &other) const;
     void writeSettings(QSettings &settings) const;
+    QString getDBUSName() const;
 
     SpaceModelType::SpaceModel modelId;
     int runTimeId;
