@@ -11,23 +11,19 @@ Requirements.
     
     
 SpaceMeld building linux:
-  Daemon:
-    cd SpaceMeldDaemon
+    cd SpaceMeld
     mkdir build
     cd build
-    qmake ../source/SpaceMeldDaemon.pro "SOLUTIONS_ROOT = ../../../../../QtSolutions/qt-solutions" QMAKE_CXXFLAGS+=-std=gnu++11
+    cmake -DCMAKE_CXX_FLAGS="-Wall -std=c++11" -DCMAKE_BUILD_TYPE=Debug ../source
     make
     
-  Controller:
-    cd SpaceMeldController
-    mkdir build
-    cd build
-    qmake ../source/SpaceMeldController.pro "SOLUTIONS_ROOT = ../../../qt-solutions"
-    make
-    
-  Path for "SOLUTIONS_ROOT" should reflect the location of the qt solutions directory.
-  Haven't done anything for install yet. You can run from build directories.
-  
+you can disable specific exports with:
+-DBUILD_EXPORT_X11_MAG=OFF
+-DBUILD_EXPORT_WIN_MAG=OFF
+-DBUILD_EXPORT_DBUS=OFF
+
+Exports control the communication between the daemon and the client. X11_MAG and WIN_MAG are for legacy magellan support only.
+The magellan protocol has been deprecated and shouldn't be used for new development. New development should use dbus.
   
 SpaceMeld operation (normal):
   After a successful build of both the daemon and the controller, launch the controller with
@@ -82,7 +78,7 @@ devices tested:
   magellan plus xt		Kubuntu amd64(12.04, 12.10, 13.04, 13.10, 14.04)	Windows7 amd64
     
   
-DBus
+DBus, In Development
 I had to create a config file for adding to the system bus. On kubuntu 14.04 it was located at
 "/etc/dbus-1/system.d/org.spacemeld.conf". guessing filename has to match service name registered.
 contents of that file:
