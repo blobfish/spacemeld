@@ -1,4 +1,7 @@
 /*
+SpaceMeld is a driver/API for spaceballs, spacemice, spacenavigators etc..
+Copyright (C) 2014 Thomas Anderson blobfish[at]gmx.com
+
 This file is part of SpaceMeld.
 
 SpaceMeld is free software: you can redistribute it and/or modify
