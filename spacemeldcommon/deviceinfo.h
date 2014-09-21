@@ -85,6 +85,7 @@ public:
     bool isEqual(const DeviceInfo &other) const;
     void writeSettings(QSettings &settings) const;
     QString getDBUSName() const;
+    QMap<int, QString> getButtonKeyMap(OutputType::Output output) const;
 
     SpaceModelType::SpaceModel modelId;
     int runTimeId;

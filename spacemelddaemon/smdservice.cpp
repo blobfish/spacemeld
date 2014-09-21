@@ -31,6 +31,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include "exportdbus.h"
 #include "monitor.h"
 #include "axesmutator.h"
+#include "buttonmutator.h"
 
 SMDService::SMDService(int argc, char **argv) :
     QtService<QCoreApplication>(argc, argv, SERVICE_NAME_STRING)
@@ -94,12 +95,15 @@ void SMDService::start()
                     mutate->setConfig(currentDevice->info());
                     QObject::connect(currentDevice, SIGNAL(displacementOut(qint16, qint16, qint16, qint16, qint16, qint16)),
                                      mutate, SLOT(displacementIn(qint16, qint16, qint16, qint16, qint16, qint16)));
-                    x11->setButtonMap(currentDevice->info());
-
                     QObject::connect(mutate, SIGNAL(displacementOut(qint16, qint16, qint16, qint16, qint16, qint16)),
                                      x11, SLOT(displacementIn(qint16, qint16, qint16, qint16, qint16, qint16)));
-                    QObject::connect(currentDevice, SIGNAL(buttonOut(qint8, bool)), x11, SLOT(buttonIn(qint8, bool)));
-
+                    
+                    ButtonMutator *buttonMutator = new ButtonMutator(currentDevice);
+                    buttonMutator->setObjectName("buttonMutator");
+                    buttonMutator->setButtonKeyMap(currentDevice->info().getButtonKeyMap(OutputType::X11));
+                    QObject::connect(currentDevice, SIGNAL(buttonOut(qint8, bool)), buttonMutator, SLOT(buttonIn(qint8, bool)));
+                    QObject::connect(buttonMutator, SIGNAL(buttonMessageOut(qint8, bool)), x11, SLOT(buttonMessageIn(qint8, bool)));
+                    QObject::connect(buttonMutator, SIGNAL(keyMessageOut(QString)), x11, SLOT(keyMessageIn(QString)));
                 }
 #endif //Q_WS_X11
 #if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
@@ -112,11 +116,15 @@ void SMDService::start()
                     mutate->setConfig(currentDevice->info());
                     QObject::connect(currentDevice, SIGNAL(displacementOut(qint16, qint16, qint16, qint16, qint16, qint16)),
                                      mutate, SLOT(displacementIn(qint16, qint16, qint16, qint16, qint16, qint16)));
-                    winMag->setButtonMap(currentDevice->info());
-
                     QObject::connect(mutate, SIGNAL(displacementOut(qint16, qint16, qint16, qint16, qint16, qint16)),
                                      winMag, SLOT(displacementIn(qint16, qint16, qint16, qint16, qint16, qint16)));
-                    QObject::connect(currentDevice, SIGNAL(buttonOut(qint8,bool)), winMag, SLOT(buttonIn(qint8,bool)));
+                    
+                    ButtonMutator *buttonMutator = new ButtonMutator(currentDevice);
+                    buttonMutator->setObjectName("buttonMutator");
+                    buttonMutator->setButtonKeyMap(currentDevice->info().getButtonKeyMap(OutputType::WIN));
+                    QObject::connect(currentDevice, SIGNAL(buttonOut(qint8, bool)), buttonMutator, SLOT(buttonIn(qint8, bool)));
+                    QObject::connect(buttonMutator, SIGNAL(buttonMessageOut(qint8, bool)), winMag, SLOT(buttonMessageIn(qint8, bool)));
+                    QObject::connect(buttonMutator, SIGNAL(keyMessageOut(QString)), winMag, SLOT(keyMessageIn(QString)));
                 }
 #endif //Q_WS_WIN
 #if defined(SPACEMELD_BUILD_EXPORT_DBUS)
@@ -132,7 +140,6 @@ void SMDService::start()
                 qDebug() << currentDevice->info().modelName << " launch FAILED";
         }
     }
-
 
         //this is temp
 //        Monitor *monitor = new Monitor(qobject_cast<QCoreApplication *>(this->application()));
@@ -232,15 +239,12 @@ void SMDService::loadAxesMutate(int deviceId)
         return;
     }
 
-    if ((!device->info().detected) || device->info().exports.at(OutputType::DBUS).enabled)
+    if ((!device->info().detected))
         return;
 
     AxesMutator *mutate = device->findChild<AxesMutator *>("axesMutator");
     if (!mutate)
-    {
-        qDebug() << "couldn't find mutator in SMDService::loadAxesMutate";
         return;
-    }
 
     DeviceInfos infos = DeviceConfig::readConfiguredDevices();
     DeviceInfos::Iterator it;
@@ -265,7 +269,11 @@ void SMDService::loadButtonMap(int deviceId)
         return;
     }
 
-    if ((!device->info().detected) || device->info().exports.at(OutputType::DBUS).enabled)
+    if ((!device->info().detected))
+        return;
+    
+    ButtonMutator *mutate = device->findChild<ButtonMutator *>("buttonMutator");
+    if (!mutate)
         return;
 
 #if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
@@ -277,10 +285,25 @@ void SMDService::loadButtonMap(int deviceId)
         {
             if ((*it).runTimeId == device->info().runTimeId)
             {
-                ExportX11::instance()->setButtonMap(*it);
+                mutate->setButtonKeyMap(device->info().getButtonKeyMap(OutputType::X11));
                 break;
             }
         }
     }
+#endif
+
+#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
+    if (currentDevice->info().exports.at(OutputType::WIN).enabled)
+    {
+      DeviceInfos infos = DeviceConfig::readConfiguredDevices();
+      DeviceInfos::Iterator it;
+      for (it = infos.begin(); it != infos.end(); ++it)
+      {
+          if ((*it).runTimeId == device->info().runTimeId)
+          {
+              mutate->setButtonKeyMap(device->info().getButtonKeyMap(OutputType::WIN));
+              break;
+          }
+      }
 #endif
 }

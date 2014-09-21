@@ -38,14 +38,14 @@ class ExportX11 : public ExportBase
 public:
     virtual ~ExportX11();
     virtual bool initialize();
-    void setButtonMap(const DeviceInfo &info);
     static int xError(Display *aDisplay, XErrorEvent *anError);
     static int xInputOutputError(Display *aDisplay);
     static ExportX11 *instance();
     
 public slots:
     void displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5);
-    void buttonIn(qint8 buttonNumber, bool buttonDown);
+    void buttonMessageIn(qint8 buttonNumberIn, bool buttonDownIn);
+    void keyMessageIn(const QString &keySequenceIn);
 
 private slots:
     void xEventsIn();
@@ -54,7 +54,7 @@ private:
     explicit ExportX11(QObject *parent = 0);
     void finish();
     void sendButtonMessage(qint8 buttonNumber, bool buttonDown);
-    void sendKeyMessage(qint8 buttonNumber, bool buttonDown);
+    void sendKeyMessage(QString keySequenceIn);
 
     Display *display;
     Window xWindow;
@@ -64,7 +64,6 @@ private:
     Atom xEventCommand;
 
     QVector<Window> clients;
-    QMap<int, QString> buttonKeyMap;
 };
 
 #endif //Q_WS_X11

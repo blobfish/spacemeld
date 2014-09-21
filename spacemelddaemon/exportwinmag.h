@@ -40,7 +40,6 @@ public:
     virtual bool initialize();
     static ExportWinMag* instance();
     void addWindow(HWND window){clients.push_back(window);}
-    void setButtonMap(const DeviceInfo &info);
     
     DWORD winEventMotion;
     DWORD winEventButtonPress;
@@ -49,17 +48,17 @@ public:
 
 public slots:
     void displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5);
-    void buttonIn(qint8 buttonNumber, bool buttonDown);
+    void buttonMessageIn(qint8 buttonNumberIn, bool buttonDownIn);
+    void keyMessageIn(const QString &keySequenceIn);
 
 private:
     explicit ExportWinMag(QObject *parent = 0);
     void sendButtonMessage(qint8 buttonNumber, bool buttonDown);
-    void sendKeyMessage(qint8 buttonNumber, bool buttonDown);
+    void sendKeyMessage(const QString &keySequenceIn);
 
     HINSTANCE hInstance;
     HWND hwnd;
     QList<HWND> clients;
-    QMap<int, QString> buttonKeyMap;
 };
 
 #endif //Q_WS_WIN

@@ -153,11 +153,6 @@ ExportWinMag* ExportWinMag::instance()
     return pointer;
 }
 
-void ExportWinMag::setButtonMap(const DeviceInfo &info)
-{
-    buttonKeyMap = info.exports.at(static_cast<int>(OutputType::WIN)).buttonKeyMap;
-}
-
 void ExportWinMag::displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5)
 {
     DWORD translations = 0;
@@ -181,17 +176,15 @@ void ExportWinMag::displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qi
     }
 }
 
-void ExportWinMag::buttonIn(qint8 buttonNumber, bool buttonDown)
+// this button messaging has been reworked, but never compiled/tested on windows.
+void ExportWinMag::buttonMessageIn(qint8 buttonNumberIn, bool buttonDownIn)
 {
-    if (buttonKeyMap.contains(buttonNumber))
-    {
-        if (!buttonKeyMap.value(buttonNumber).isEmpty())
-        {
-            sendKeyMessage(buttonNumber, buttonDown);
-            return;
-        }
-    }
-    sendButtonMessage(buttonNumber, buttonDown);
+  sendButtonMessage(buttonNumberIn, buttonDownIn);
+}
+
+void ExportWinMag::keyMessageIn(const QString &keySequenceIn)
+{
+  sendKeyMessage(keySequenceIn);
 }
 
 void ExportWinMag::sendButtonMessage(qint8 buttonNumber, bool buttonDown)
@@ -214,11 +207,10 @@ void ExportWinMag::sendButtonMessage(qint8 buttonNumber, bool buttonDown)
     }
 }
 
-void ExportWinMag::sendKeyMessage(qint8 buttonNumber, bool buttonDown)
+//never got this working on windows.
+void ExportWinMag::sendKeyMessage(const QString &keySequenceIn)
 {
-    //only send on button down.
-    if (!buttonDown)
-        return;
+
 }
 
 #endif //Q_WS_WIN

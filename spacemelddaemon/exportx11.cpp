@@ -152,48 +152,44 @@ void ExportX11::displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint1
     XFlush(display);
 }
 
-void ExportX11::buttonIn(qint8 buttonNumber, bool buttonDown)
+void ExportX11::buttonMessageIn(qint8 buttonNumberIn, bool buttonDownIn)
 {
-    if (buttonKeyMap.contains(buttonNumber))
-    {
-        if (!buttonKeyMap.value(buttonNumber).isEmpty())
-        {
-            sendKeyMessage(buttonNumber, buttonDown);
-            return;
-        }
-    }
-    sendButtonMessage(buttonNumber, buttonDown);
+  sendButtonMessage(buttonNumberIn, buttonDownIn);
 }
 
-void ExportX11::sendKeyMessage(qint8 buttonNumber, bool buttonDown)
+void ExportX11::keyMessageIn(const QString &keySequenceIn)
 {
-    //only send on button down.
-    if (!buttonDown)
-        return;
+  sendKeyMessage(keySequenceIn);
+}
+
+void ExportX11::sendKeyMessage(QString keySequenceIn)
+{
+  qDebug() << "sendKeyMessage received: " << keySequenceIn;
+  
     //note on X meta and alt appear to be the same.
     //run xmodmap on terminal to discover.
-    QString string = buttonKeyMap.value(buttonNumber);
     quint32 modState(0);
-    if (string.contains("Ctrl"))
+    if (keySequenceIn.contains("Ctrl"))
         modState |= ControlMask;
-    if (string.contains("Shift"))
+    if (keySequenceIn.contains("Shift"))
         modState |= ShiftMask;
-    if (string.contains("Alt") || string.contains("Meta"))
+    if (keySequenceIn.contains("Alt") || keySequenceIn.contains("Meta"))
         modState |= Mod1Mask;
 
-    string.remove("Alt");
-    string.remove("Shift");
-    string.remove("Ctrl");
-    string.remove("Meta");
-    string.remove("+");
+    keySequenceIn.remove("Alt");
+    keySequenceIn.remove("Shift");
+    keySequenceIn.remove("Ctrl");
+    keySequenceIn.remove("Meta");
+    keySequenceIn.remove("+");
 
-    if (string.size() != 1)
+    if (keySequenceIn.size() != 1)
     {
-        qDebug() << "string size is not 1 in ExportX11::sendKeyMessage";
+        qDebug() << "keySequenceIn size is not 1 in ExportX11::sendKeyMessage";
         return;
     }
 
-    int inputKey = static_cast<int>(string.at(0).toAscii());
+    //toascii? other languages?
+    int inputKey = static_cast<int>(keySequenceIn.at(0).toAscii());
 
     XKeyEvent event;
     event.type = KeyPress;
@@ -216,7 +212,7 @@ void ExportX11::sendKeyMessage(qint8 buttonNumber, bool buttonDown)
 
 void ExportX11::sendButtonMessage(qint8 buttonNumber, bool buttonDown)
 {
-    //    qDebug() << "Button: " << buttonNumber << ((buttonDown) ? " pressed" : " released");
+        qDebug() << "Button: " << buttonNumber << ((buttonDown) ? " pressed" : " released");
 
         XEvent event;
         event.type = ClientMessage;
@@ -233,11 +229,6 @@ void ExportX11::sendButtonMessage(qint8 buttonNumber, bool buttonDown)
             XSendEvent(display, *it, False, 0, &event);
         }
         XFlush(display);
-}
-
-void ExportX11::setButtonMap(const DeviceInfo &info)
-{
-    buttonKeyMap = info.exports.at(static_cast<int>(OutputType::X11)).buttonKeyMap;
 }
 
 #endif

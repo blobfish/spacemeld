@@ -41,6 +41,7 @@ set(DAEMON_CORE_SRCS
       deviceserialball4000flx.cpp
       exportbase.cpp
       axesmutator.cpp
+      buttonmutator.cpp
       ${CMAKE_SOURCE_DIR}/spacemeldcommon/deviceconfig.cpp
       ${CMAKE_SOURCE_DIR}/spacemeldcommon/deviceinfo.cpp
       ${CMAKE_SOURCE_DIR}/spacemeldcommon/knowndevices.cpp

@@ -286,3 +286,14 @@ QString DeviceInfo::getDBUSName() const
     stream << tempName << "_" << ConnectionInterfaceType::getString(interfaceId) << "_" << tempPath;
     return out;
 }
+
+QMap<int, QString> DeviceInfo::getButtonKeyMap(OutputType::Output output) const
+{
+  for (auto it = exports.begin(); it != exports.end(); ++it)
+  {
+    if(it->type == output)
+      return it->buttonKeyMap;
+  }
+  qDebug() << "Error: no output type in DeviceInfo::getButtonKeyMap";
+  return QMap<int, QString>();
+}
