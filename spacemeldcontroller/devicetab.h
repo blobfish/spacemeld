@@ -136,6 +136,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
+    bool showAxisButtonMap(const QModelIndex &index);
 public slots:
     void selectionChangedSlot(const QModelIndex &current, const QModelIndex &previous);
 
@@ -172,12 +173,12 @@ public:
 
 public slots:
     void driverStatus(bool signal);
+    void exportSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private slots:
     void driverStatusHelper();
     void selectionUpdate(int index);
     void saveSplittersSlot(int pos, int index);
-
 
 private:
     void buildGui();

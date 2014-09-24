@@ -55,6 +55,13 @@ inline const char* getString(int index)
     static const char names[][10] = {"X11", "DBUS", "Win", "Mac"};
     return names[index];
 }
+inline bool showAxisButtonMap(int index)
+{
+  if (index == 0 || index == 2 || index == 3)
+    return true;
+  else
+    return false;
+}
 }
 
 class ExportInfo

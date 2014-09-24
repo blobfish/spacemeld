@@ -94,6 +94,9 @@ void Tab::buildGui()
     ExportFilterModel *exportFilterModel = new ExportFilterModel(exportModel);
     exportFilterModel->setSourceModel(exportModel);
     exportFilterModel->setDynamicSortFilter(true);
+    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), exportModel,
+            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+    connect(exportModel, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(exportSelectionChanged(QModelIndex, QModelIndex)));
     
     exportView = new QTableView(subSplitter);
     exportView->setToolTip(tr("Export Communication:\n"
@@ -108,8 +111,8 @@ void Tab::buildGui()
     exportView->setSelectionMode(QAbstractItemView::SingleSelection);
     BoolDelegate *exportDelegate = new BoolDelegate(exportView);
     exportView->setItemDelegateForColumn(1, exportDelegate);
-    connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), exportModel,
-            SLOT(selectionChangedSlot(QModelIndex,QModelIndex)));
+    connect(exportView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)),
+            this, SLOT(exportSelectionChanged(QModelIndex, QModelIndex)));
 
     subSplitter->addWidget(exportView);
 
@@ -219,6 +222,23 @@ void Tab::loadSplitters()
     if (settings.contains("subSplitter"))
         subSplitter->restoreState(settings.value("subSplitter").toByteArray());
 }
+
+void Tab::exportSelectionChanged(const QModelIndex& current, const QModelIndex& previous)
+{
+  if (!current.isValid())
+    return;
+  if (exportModel->showAxisButtonMap(current))
+  {
+    axesView->show();
+    buttonMapView->show();
+  }
+  else
+  {
+    axesView->hide();
+    buttonMapView->hide();
+  }
+}
+
 
 TableModel::TableModel(QObject *parent, DeviceInfos &deviceInfosIn) : QAbstractTableModel(parent),
     deviceInfos(deviceInfosIn)
@@ -531,15 +551,7 @@ void AxesModel::selectionChangedSlot(const QModelIndex &current, const QModelInd
 void AxesModel::exportChangedSlot(const QModelIndex &current, const QModelIndex &previous)
 {
     this->beginResetModel();
-    if (current.isValid())
-    {
-        if (OutputType::getType(current.row()) == OutputType::DBUS)
-            exportId = -1;
-        else
-            exportId = current.row();
-    }
-    else
-        exportId = -1;
+    exportId = current.row();
     this->endResetModel();
 }
 
@@ -810,15 +822,7 @@ void ButtonMapModel::selectionChangedSlot(const QModelIndex &current, const QMod
 void ButtonMapModel::exportChangedSlot(const QModelIndex &current, const QModelIndex &previous)
 {
     this->beginResetModel();
-    if (current.isValid())
-    {
-        if (OutputType::getType(current.row()) == OutputType::DBUS)
-            exportId = -1;
-        else
-            exportId = current.row();
-    }
-    else
-        exportId = -1;
+    exportId = current.row();
     this->endResetModel();
 }
 
@@ -916,6 +920,14 @@ void ExportModel::selectionChangedSlot(const QModelIndex &current, const QModelI
     else
         infoIndex = -1;
     this->endResetModel();
+}
+
+bool ExportModel::showAxisButtonMap(const QModelIndex& index)
+{
+  if (!index.isValid() || infoIndex < 0)
+    return false;
+  return
+    OutputType::showAxisButtonMap(index.row()) && deviceInfos.at(infoIndex).exports.at(index.row()).enabled;
 }
 
 ExportFilterModel::ExportFilterModel(QObject *parent) : QSortFilterProxyModel(parent)
