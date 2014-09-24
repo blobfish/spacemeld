@@ -7,14 +7,14 @@ Requirements.
     I believe Qt5 will include QSerialDevice by default. For Qt4 it must be built and installed.
     I needed libudev-dev to build QSerialDevice....... As of 08/01/2014, has been renamed to qserialport and
     the repository has moved to "git://gitorious.org/qt/qtserialport.git". Build with 
-    "qmake ../qtserialport.pro" then "make" then "sudo make install"
+    "qmake-qt4 ../source/qtserialport.pro" then "make" then "sudo make install"
     
     
 SpaceMeld building linux:
     cd SpaceMeld
     mkdir build
     cd build
-    cmake -DCMAKE_CXX_FLAGS="-Wall -std=c++11" -DCMAKE_BUILD_TYPE=Debug ../source
+    cmake -DQT_QMAKE_EXECUTABLE=qmake-qt4 -DCMAKE_CXX_FLAGS="-Wall -std=c++11" -DCMAKE_BUILD_TYPE=Debug ../source
     make
     
 you can disable specific exports with:
@@ -91,14 +91,17 @@ contents of that file:
   <policy user="root">
     <allow own="org.spacemeld"/>
   </policy>
-
+ 
   <!-- Allow anyone to call into the service - we'll reject callers using PolicyKit -->
   <policy context="default">
-    <allow send_interface="org.spacemeld"/>
+    <allow send_destination="org.spacemeld"
+           send_interface="org.freedesktop.DBus.Introspectable"/>
+    <allow send_destination="org.spacemeld"
+           send_interface="org.freedesktop.DBus.Properties"/>
+    <allow send_destination="org.spacemeld"
+           send_interface="org.spacemeld.device"/>
     <allow receive_sender="org.spacemeld"/>
     <allow receive_interface="org.spacemeld"/>
   </policy>
 </busconfig>
 
-Above file contents are the results of the first successful test on the system bus.
-Contents have evolved as needed. Don't use this content as long as this note exist.
