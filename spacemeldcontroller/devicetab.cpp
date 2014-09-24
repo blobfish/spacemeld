@@ -18,6 +18,8 @@ You should have received a copy of the GNU General Public License
 along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assert.h>
+
 #include <QtGui/QtGui>
 #include <QComboBox>
 #include <QCheckBox>
@@ -89,6 +91,10 @@ void Tab::buildGui()
     subSplitter->setOrientation(Qt::Horizontal);
 
     exportModel = new ExportModel(subSplitter, deviceInfos);
+    ExportFilterModel *exportFilterModel = new ExportFilterModel(exportModel);
+    exportFilterModel->setSourceModel(exportModel);
+    exportFilterModel->setDynamicSortFilter(true);
+    
     exportView = new QTableView(subSplitter);
     exportView->setToolTip(tr("Export Communication:\n"
                               "   Devices can be mapping through different export protocols.\n"
@@ -98,7 +104,7 @@ void Tab::buildGui()
                               "      DBUS: for dbus compatibility. (new development).\n"
                               "         axes and button configuration for DBUS are done at client.\n"
                               "   Changes here require a service restart to take affect."));
-    exportView->setModel(exportModel);
+    exportView->setModel(exportFilterModel);
     exportView->setSelectionMode(QAbstractItemView::SingleSelection);
     BoolDelegate *exportDelegate = new BoolDelegate(exportView);
     exportView->setItemDelegateForColumn(1, exportDelegate);
@@ -910,6 +916,29 @@ void ExportModel::selectionChangedSlot(const QModelIndex &current, const QModelI
     else
         infoIndex = -1;
     this->endResetModel();
+}
+
+ExportFilterModel::ExportFilterModel(QObject *parent) : QSortFilterProxyModel(parent)
+{
+  exportPredicates.resize(OutputType::size(), false);
+#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
+  exportPredicates[0] = true;
+#endif
+  
+#if defined(SPACEMELD_BUILD_EXPORT_DBUS)
+  exportPredicates[1] = true;
+#endif
+  
+#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
+  exportPredicates[2] = true;
+#endif
+  
+  //no mac yet.
+}
+
+bool ExportFilterModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
+{
+  return exportPredicates.at(source_row);
 }
 
 ButtonMapView::ButtonMapView(QWidget *parent) : QTableView(parent)

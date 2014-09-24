@@ -26,6 +26,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include <QAbstractTableModel>
 #include <QStyledItemDelegate>
 #include <QLineEdit>
+#include <QSortFilterProxyModel>
 #include "deviceinfo.h"
 #include "deviceconfig.h"
 
@@ -142,6 +143,17 @@ private:
     QStringList headerStrings;
     DeviceInfos &deviceInfos;
     int infoIndex;
+};
+
+class ExportFilterModel : public QSortFilterProxyModel
+{
+  Q_OBJECT
+public:
+  explicit ExportFilterModel(QObject *parent);
+protected:
+  virtual bool filterAcceptsRow (int source_row, const QModelIndex &source_parent) const override;
+private:
+  std::vector<bool> exportPredicates;
 };
 
 class ButtonMapView : public QTableView

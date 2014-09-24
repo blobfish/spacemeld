@@ -39,6 +39,18 @@ set(CONTROLLER_CORE_SRCS
     ${CMAKE_SOURCE_DIR}/spacemeldcommon/knowndevices.cpp
    )
 
+if(BUILD_EXPORT_X11_MAG)
+  add_definitions(-DSPACEMELD_BUILD_EXPORT_X11_MAG)
+endif()
+
+if(BUILD_EXPORT_WIN_MAG)
+  add_definitions(-DSPACEMELD_BUILD_EXPORT_WIN_MAG)
+endif()
+
+if(BUILD_EXPORT_DBUS)
+  add_definitions(-DSPACEMELD_BUILD_EXPORT_DBUS)
+endif()
+
 find_package(Qt4 COMPONENTS QtCore QtNetwork QtGui REQUIRED)
 INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
