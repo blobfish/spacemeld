@@ -164,7 +164,7 @@ void ExportX11::keyMessageIn(const QString &keySequenceIn)
 
 void ExportX11::sendKeyMessage(QString keySequenceIn)
 {
-  qDebug() << "sendKeyMessage received: " << keySequenceIn;
+//   qDebug() << "sendKeyMessage received: " << keySequenceIn;
   
     //note on X meta and alt appear to be the same.
     //run xmodmap on terminal to discover.
@@ -212,7 +212,7 @@ void ExportX11::sendKeyMessage(QString keySequenceIn)
 
 void ExportX11::sendButtonMessage(qint8 buttonNumber, bool buttonDown)
 {
-        qDebug() << "Button: " << buttonNumber << ((buttonDown) ? " pressed" : " released");
+//         qDebug() << "Button: " << buttonNumber << ((buttonDown) ? " pressed" : " released");
 
         XEvent event;
         event.type = ClientMessage;
