@@ -18,15 +18,9 @@
 
 cmake_minimum_required(VERSION 2.8.6) #for automoc
 project(spacemelddaemon)
+message("\nConfiguring daemon")
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_AUTOMOC TRUE)
-
-set(ADDITIONAL_INCLUDE_PATHS
-    ${CMAKE_CURRENT_BINARY_DIR} #needed to find moc files.
-    ${CMAKE_SOURCE_DIR}/qtsolutions/qtservice/src
-    ${CMAKE_SOURCE_DIR}/spacemeldcommon
-    )
-INCLUDE_DIRECTORIES(${ADDITIONAL_INCLUDE_PATHS})
 
 set(DAEMON_CORE_SRCS
       main.cpp
@@ -48,16 +42,23 @@ set(DAEMON_CORE_SRCS
    )
 
 if(BUILD_EXPORT_X11_MAG)
-  add_definitions(-DSPACEMELD_BUILD_EXPORT_X11_MAG)
-  set(DAEMON_X11_SRCS
-        exportx11.cpp
+  find_package(X11)
+  if(X11_FOUND)
+    add_definitions(-DSPACEMELD_BUILD_EXPORT_X11_MAG)
+    set(DAEMON_X11_SRCS
+          exportx11.cpp
+        )
+    set(DAEMON_X11_LIBS
+          ${X11_LIBRARIES}
       )
-  set(DAEMON_X11_LIBS
-        "X11"
-     )
-endif()
+    message(STATUS "Building X11 export.")
+  else(X11_FOUND)
+    message(WARNING "NOT building X11 export.")
+  endif(X11_FOUND)
+endif(BUILD_EXPORT_X11_MAG)
 
 if(BUILD_EXPORT_WIN_MAG)
+  #add find package for win32 api. Like X11 above.
   add_definitions(-DSPACEMELD_BUILD_EXPORT_WIN_MAG)
   set(DAEMON_WIN_SRCS
         exportwinmag.cpp
@@ -70,19 +71,34 @@ if(BUILD_EXPORT_WIN_MAG)
 endif()
 
 if(BUILD_EXPORT_DBUS)
-  find_package(Qt4 COMPONENTS QtDBus REQUIRED)
-  add_definitions(-DSPACEMELD_BUILD_EXPORT_DBUS)
-  set(DAEMON_DBUS_SRCS
-        exportdbus.cpp
-        dbusbaseserver.cpp
-      )
-  #don't think I need the lib because part of qt.
+  find_package(Qt5DBus)
+  if(Qt5DBus_FOUND)
+    add_definitions(-DSPACEMELD_BUILD_EXPORT_DBUS)
+    set(DAEMON_DBUS_SRCS
+          exportdbus.cpp
+          dbusbaseserver.cpp
+        )
+    set(DAEMON_DBUS_LIBS
+          Qt5::DBus
+        )
+    message(STATUS "Building dbus export.")
+  else(Qt5DBus_FOUND)
+    message(WARNING "NOT building dbus export.")
+  endif(Qt5DBus_FOUND)
 endif()
 
 #this is down here after the export dbus for the "add_definitions"
-find_package(Qt4 COMPONENTS QtCore QtNetwork REQUIRED)
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Network REQUIRED)
+find_package(Qt5SerialPort REQUIRED)
+
+set(ADDITIONAL_INCLUDE_PATHS
+    ${CMAKE_CURRENT_BINARY_DIR} #needed to find moc files.
+    ${CMAKE_SOURCE_DIR}/qtsolutions/qtservice/src
+    ${CMAKE_SOURCE_DIR}/spacemeldcommon
+    ${X11_INCLUDE_DIR}
+    )
+INCLUDE_DIRECTORIES(${ADDITIONAL_INCLUDE_PATHS})
 
 set(DAEMON_SRCS
       ${QTSERVICE_SRCS}
@@ -93,12 +109,12 @@ set(DAEMON_SRCS
    )
 
 set(DAEMON_LIBS
-      ${QT_LIBRARIES}
+      Qt5::Core
+      Qt5::Network
+      Qt5::SerialPort
       ${DAEMON_X11_LIBS}
       ${DAEMON_WIN_LIBS}
-      #find_package qt4 doesn't yet support serialport. hopefully this will
-      #change in near future. until then this ugly hack.
-      /usr/lib/x86_64-linux-gnu/libQtSerialPort.so
+      ${DAEMON_DBUS_LIBS}
    )
 
 add_executable(spacemelddaemon ${DAEMON_SRCS})

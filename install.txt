@@ -1,20 +1,26 @@
 Requirements.
-  qt4.8.1 or higher. tested on 4.8.1 and 4.8.3. Might work on earlier versions, need testing.
-  qtsolutions: as of 10/29/2012, this can be found at http://qt.gitorious.org/qt-solutions. the
-    repository can be found at "git@gitorious.org:qt-solutions/qt-solutions.git".
-    This is a source only library. No building and installing.
-  QSerialDevice: as of 10/29/2012, this can be found at http://qt.gitorious.org/qtplayground/qtserialport
-    I believe Qt5 will include QSerialDevice by default. For Qt4 it must be built and installed.
-    I needed libudev-dev to build QSerialDevice....... As of 08/01/2014, has been renamed to qserialport and
-    the repository has moved to "git://gitorious.org/qt/qtserialport.git". Build with 
-    "qmake-qt4 ../source/qtserialport.pro" then "make" then "sudo make install"
+  sudo apt-get install qtbase5-dev
+  
+  qtsolutions: as of 12/16/2014, this is now a submodule of this git repo.
+    use recurvise switch in the clone option to get this submodule. git clone --recursive theMainRepo
+    if already have clone, but no submodule, use:
+      cd submoduleDirectory
+      git submodule update --init --recursive
+    this advice came from http://stackoverflow.com/questions/3796927/how-to-git-clone-including-submodules
     
+    using the --recursive switch in the clone operation doesn't work right now. The master branch has the
+      wrong submodule url. so we do a normal clone and checkout the qt5 branch (which has the right url).
+      Then do the git submodule update --init --recursive command. This will cause the git submodule to be
+      in a detached head state. to fix just git checkout master from the submodule directory.
+
+  QSerialDevice: as of 12/16/2014, this is included in kubunut 14.10. No longer has to compiled and installed.
+    sudo apt-get install libqt5serialport5-dev
     
 SpaceMeld building linux:
     cd SpaceMeld
     mkdir build
     cd build
-    cmake -DQT_QMAKE_EXECUTABLE=qmake-qt4 -DCMAKE_CXX_FLAGS="-Wall -std=c++11" -DCMAKE_BUILD_TYPE=Debug ../source
+    cmake -DCMAKE_CXX_FLAGS="-Wall" -DCMAKE_BUILD_TYPE=Debug ../source
     make
     
 you can disable specific exports with:

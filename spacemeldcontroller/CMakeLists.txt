@@ -18,6 +18,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 project(spacemeldcontroller)
+message("\nConfiguring controller")
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_AUTOMOC TRUE)
 
@@ -40,35 +41,52 @@ set(CONTROLLER_CORE_SRCS
    )
 
 if(BUILD_EXPORT_X11_MAG)
-  add_definitions(-DSPACEMELD_BUILD_EXPORT_X11_MAG)
-endif()
+  find_package(X11)
+    if(X11_FOUND)
+      add_definitions(-DSPACEMELD_BUILD_EXPORT_X11_MAG)
+      set(DAEMON_X11_SRCS
+            exportx11.cpp
+          )
+      set(DAEMON_X11_LIBS
+            ${X11_LIBRARIES}
+        )
+      message(STATUS "Building X11 export.")
+    else(X11_FOUND)
+      message(WARNING "NOT building X11 export.")
+    endif(X11_FOUND)
+endif(BUILD_EXPORT_X11_MAG)
 
 if(BUILD_EXPORT_WIN_MAG)
+  #add find package for win32 api. Like X11 above.
   add_definitions(-DSPACEMELD_BUILD_EXPORT_WIN_MAG)
 endif()
 
 if(BUILD_EXPORT_DBUS)
+  #add this point the controller use any dbus.
+  #this is purely for controlling the gui.
   add_definitions(-DSPACEMELD_BUILD_EXPORT_DBUS)
-endif()
+  message(STATUS "Building dbus export.")
+endif(BUILD_EXPORT_DBUS)
 
-find_package(Qt4 COMPONENTS QtCore QtNetwork QtGui REQUIRED)
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Network REQUIRED)
+find_package(Qt5Widgets REQUIRED)
 
 set(CONTROLLER_RESOURCES_IN
   image.qrc
   )
-QT4_ADD_RESOURCES(CONTROLLER_RESOURCES_OUT ${CONTROLLER_RESOURCES_IN})
+QT5_ADD_RESOURCES(CONTROLLER_RESOURCES_OUT ${CONTROLLER_RESOURCES_IN})
 
 set(CONTROLLER_SRCS
       ${QTSERVICE_SRCS}
       ${CONTROLLER_CORE_SRCS}
-      ${DAEMON_DBUS_SRCS}
       ${CONTROLLER_RESOURCES_OUT}
    )
 
 set(CONTROLLER_LIBS
-      ${QT_LIBRARIES}
+      Qt5::Core
+      Qt5::Network
+      Qt5::Widgets
    )
 
 add_executable(spacemeldcontroller ${CONTROLLER_SRCS})

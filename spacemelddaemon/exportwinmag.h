@@ -21,12 +21,13 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef EXPORTWINMAG_H
 #define EXPORTWINMAG_H
 
+#if defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
+
 #include <QtCore/QList>
 #include <QtCore/QVector>
 #include "exportbase.h"
 #include "deviceinfo.h"
 
-#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
 #include <qt_windows.h>
 
 #define WIN_MAG_CLASS_NAME "MAGELLAN_3D_CONTROLLER"
@@ -61,6 +62,6 @@ private:
     QList<HWND> clients;
 };
 
-#endif //Q_WS_WIN
+#endif //SPACEMELD_BUILD_EXPORT_WIN_MAG
 
 #endif // EXPORTWINMAG_H

@@ -85,7 +85,7 @@ void SMDService::start()
             if (currentDevice->launch())
             {
                 qDebug() << currentDevice->info().modelName << " is ready";
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
+#if defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
                 if (currentDevice->info().exports.at(OutputType::X11).enabled)
                 {
                     ExportX11 *x11 = ExportX11::instance();
@@ -105,8 +105,8 @@ void SMDService::start()
                     QObject::connect(buttonMutator, SIGNAL(buttonMessageOut(qint8, bool)), x11, SLOT(buttonMessageIn(qint8, bool)));
                     QObject::connect(buttonMutator, SIGNAL(keyMessageOut(QString)), x11, SLOT(keyMessageIn(QString)));
                 }
-#endif //Q_WS_X11
-#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
+#endif //SPACEMELD_BUILD_EXPORT_X11_MAG
+#if defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
                 if (currentDevice->info().exports.at(OutputType::WIN).enabled)
                 {
                     ExportWinMag *winMag = ExportWinMag::instance();
@@ -126,7 +126,7 @@ void SMDService::start()
                     QObject::connect(buttonMutator, SIGNAL(buttonMessageOut(qint8, bool)), winMag, SLOT(buttonMessageIn(qint8, bool)));
                     QObject::connect(buttonMutator, SIGNAL(keyMessageOut(QString)), winMag, SLOT(keyMessageIn(QString)));
                 }
-#endif //Q_WS_WIN
+#endif //SPACEMELD_BUILD_EXPORT_WIN_MAG
 #if defined(SPACEMELD_BUILD_EXPORT_DBUS)
                 if (currentDevice->info().exports.at(OutputType::DBUS).enabled)
                 {
@@ -276,7 +276,7 @@ void SMDService::loadButtonMap(int deviceId)
     if (!mutate)
         return;
 
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
+#if defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
     if (device->info().exports.at(OutputType::X11).enabled)
     {
         DeviceInfos infos = DeviceConfig::readConfiguredDevices();
@@ -290,9 +290,9 @@ void SMDService::loadButtonMap(int deviceId)
             }
         }
     }
-#endif
+#endif //SPACEMELD_BUILD_EXPORT_X11_MAG
 
-#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
+#if defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
     if (currentDevice->info().exports.at(OutputType::WIN).enabled)
     {
       DeviceInfos infos = DeviceConfig::readConfiguredDevices();
@@ -305,5 +305,5 @@ void SMDService::loadButtonMap(int deviceId)
               break;
           }
       }
-#endif
+#endif //SPACEMELD_BUILD_EXPORT_WIN_MAG
 }

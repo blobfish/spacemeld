@@ -21,8 +21,13 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 
 #include <QtGui/QtGui>
-#include <QComboBox>
-#include <QCheckBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QProgressBar>
+#include <QtWidgets/QSplitter>
 #include <QKeySequence>
 #include "qtservice.h"
 #include "definitions.h"
@@ -933,7 +938,7 @@ bool ExportModel::showAxisButtonMap(const QModelIndex& index)
 ExportFilterModel::ExportFilterModel(QObject *parent) : QSortFilterProxyModel(parent)
 {
   exportPredicates.resize(OutputType::size(), false);
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
+#if defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
   exportPredicates[0] = true;
 #endif
   
@@ -941,7 +946,7 @@ ExportFilterModel::ExportFilterModel(QObject *parent) : QSortFilterProxyModel(pa
   exportPredicates[1] = true;
 #endif
   
-#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
+#if defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
   exportPredicates[2] = true;
 #endif
   

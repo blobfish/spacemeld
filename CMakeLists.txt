@@ -51,3 +51,5 @@ option(USER_BUILD_CONTROLLER "Build the controller application" ON)
 if(USER_BUILD_CONTROLLER)
   add_subdirectory(spacemeldcontroller)
 endif()
+
+add_subdirectory(spacemeldtests)

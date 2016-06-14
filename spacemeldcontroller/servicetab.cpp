@@ -19,7 +19,16 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <QSettings>
-#include <QtGui/QtGui>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QFileDialog>
 
 #include "qtservice.h"
 
@@ -200,7 +209,7 @@ void Tab::goInstallButton()
     QString username;
     QString password;
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
     UserPasswordDialog dialog;
     if (dialog.exec() != QDialog::Accepted)
         return;

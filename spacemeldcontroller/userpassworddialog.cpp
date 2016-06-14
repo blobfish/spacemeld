@@ -18,11 +18,11 @@ You should have received a copy of the GNU General Public License
 along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QLineEdit>
-#include <QLabel>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QDialogButtonBox>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QDialogButtonBox>
 #include <QIcon>
 #include "userpassworddialog.h"
 

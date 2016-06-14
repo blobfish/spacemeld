@@ -21,15 +21,20 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef EXPORTX11_H
 #define EXPORTX11_H
 
+#if defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
+
 #include <QtCore/qglobal.h>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 #include "exportbase.h"
 #include "deviceinfo.h"
 
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+// moc file of this file wouldn't compile. Fix is the following line. Not sure exactly
+// what the situation is, but got the fix from here.
+// http://lists.qt-project.org/pipermail/interest/2013-September/008687.html
+#undef Bool
 
 
 class ExportX11 : public ExportBase
@@ -55,6 +60,7 @@ private:
     void finish();
     void sendButtonMessage(qint8 buttonNumber, bool buttonDown);
     void sendKeyMessage(QString keySequenceIn);
+    void cleanBadWindows();
 
     Display *display;
     Window xWindow;
@@ -66,6 +72,6 @@ private:
     QVector<Window> clients;
 };
 
-#endif //Q_WS_X11
+#endif //SPACEMELD_BUILD_EXPORT_X11_MAG
 
 #endif // EXPORTX11_H

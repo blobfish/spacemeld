@@ -21,7 +21,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SERVICETAB_H
 #define SERVICETAB_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 class QLabel;
 class QLineEdit;

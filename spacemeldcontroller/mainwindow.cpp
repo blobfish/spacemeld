@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QTabWidget>
+#include <QtWidgets/QTabWidget>
 #include <QSettings>
 #include <QCloseEvent>
 #include "mainwindow.h"

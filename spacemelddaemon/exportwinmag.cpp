@@ -18,10 +18,11 @@ You should have received a copy of the GNU General Public License
 along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#if defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
+
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 
-#if defined(Q_WS_WIN) && defined(SPACEMELD_BUILD_EXPORT_WIN_MAG)
 #include "exportwinmag.h"
 
 static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -213,4 +214,4 @@ void ExportWinMag::sendKeyMessage(const QString &keySequenceIn)
 
 }
 
-#endif //Q_WS_WIN
+#endif //SPACEMELD_BUILD_EXPORT_WIN_MAG

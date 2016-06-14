@@ -23,17 +23,19 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtCore/QDebug>
 #include <QtCore/QCoreApplication>
 
-#if defined(Q_WS_X11) && defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
+#if defined(SPACEMELD_BUILD_EXPORT_X11_MAG)
 
 #include "exportx11.h"
 #include <X11/keysym.h>
 
+std::vector<Window> badWindows;
 
 ExportX11::ExportX11(QObject *parent) :
     ExportBase(parent)
 {
     display = 0;
     xWindow = 0;
+    badWindows.clear();
 }
 
 ExportX11::~ExportX11()
@@ -95,8 +97,11 @@ void ExportX11::finish()
 
 int ExportX11::xError(Display *aDisplay, XErrorEvent *anError)
 {
+  if (anError->error_code == BadWindow)
+    badWindows.push_back(static_cast<Window>(anError->resourceid));
+  else
     qDebug() << "x error code: " << anError->error_code;
-    return 0;
+  return 0;
 }
 
 int ExportX11::xInputOutputError(Display *aDisplay)
@@ -126,7 +131,7 @@ void ExportX11::xEventsIn()
 
 void ExportX11::displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint16 a4, qint16 a5)
 {
-//    qDebug() << "Displacement: " << values;
+//    qDebug() << "Displacement: " << a0 << a1 << a2 << a3 << a4 << a5;
 
     XEvent event;
     event.type = ClientMessage;
@@ -150,6 +155,7 @@ void ExportX11::displacementIn(qint16 a0, qint16 a1, qint16 a2, qint16 a3, qint1
         XSendEvent(display, *it, False, 0, &event);
     }
     XFlush(display);
+    cleanBadWindows();
 }
 
 void ExportX11::buttonMessageIn(qint8 buttonNumberIn, bool buttonDownIn)
@@ -189,7 +195,7 @@ void ExportX11::sendKeyMessage(QString keySequenceIn)
     }
 
     //toascii? other languages?
-    int inputKey = static_cast<int>(keySequenceIn.at(0).toAscii());
+    int inputKey = static_cast<int>(keySequenceIn.at(0).toLatin1());
 
     XKeyEvent event;
     event.type = KeyPress;
@@ -208,6 +214,7 @@ void ExportX11::sendKeyMessage(QString keySequenceIn)
         XSendEvent(display, *it, True, KeyPressMask, (XEvent*)(&event));
     }
     XFlush(display);
+    cleanBadWindows();
 }
 
 void ExportX11::sendButtonMessage(qint8 buttonNumber, bool buttonDown)
@@ -229,6 +236,18 @@ void ExportX11::sendButtonMessage(qint8 buttonNumber, bool buttonDown)
             XSendEvent(display, *it, False, 0, &event);
         }
         XFlush(display);
+        cleanBadWindows();
+}
+
+void ExportX11::cleanBadWindows()
+{
+  for (auto currentBad : badWindows)
+  {
+    QVector<Window>::iterator it = std::find(clients.begin(), clients.end(), currentBad);
+    if (it != clients.end())
+      clients.erase(it);
+  }
+  badWindows.clear();
 }
 
 #endif

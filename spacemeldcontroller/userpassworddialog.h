@@ -21,7 +21,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef USERPASSWORDDIALOG_H
 #define USERPASSWORDDIALOG_H
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 class QLineEdit;
 
 class UserPasswordDialog : public QDialog

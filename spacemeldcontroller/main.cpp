@@ -18,7 +18,8 @@ You should have received a copy of the GNU General Public License
 along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
+
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])

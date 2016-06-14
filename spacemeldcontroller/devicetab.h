@@ -21,12 +21,12 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef DEVICETAB_H
 #define DEVICETAB_H
 
-#include <QWidget>
-#include <QTableView>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QTableView>
 #include <QAbstractTableModel>
-#include <QStyledItemDelegate>
-#include <QLineEdit>
 #include <QSortFilterProxyModel>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QLineEdit>
 #include "deviceinfo.h"
 #include "deviceconfig.h"
 
@@ -55,7 +55,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
-    void myReset(){this->reset();}
+    void myReset(){this->beginResetModel(); this->endResetModel();}
 
 private:
     QStringList headerStrings;
