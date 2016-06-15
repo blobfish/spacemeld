@@ -30,6 +30,7 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #include "exportwinmag.h"
 #include "exportdbus.h"
 #include "exportqlocal.h"
+#include "exportspacenav.h"
 #include "monitor.h"
 #include "axesmutator.h"
 #include "buttonmutator.h"
@@ -146,6 +147,16 @@ void SMDService::start()
                                    localServer, SLOT(buttonFromDeviceSlot(qint8,bool)));
                 }
 #endif //SPACEMELD_BUILD_EXPORT_QLOCAL
+#if defined(SPACEMELD_BUILD_EXPORT_SPACENAV)
+                if (currentDevice->info().exports.at(OutputType::SPACENAV).enabled)
+                {
+                  ExportSpaceNav *spaceNav = ExportSpaceNav::instance();
+                  QObject::connect(currentDevice, SIGNAL(displacementOut(qint16,qint16,qint16,qint16,qint16,qint16)),
+                                   spaceNav, SLOT(displacementFromDeviceSlot(qint16,qint16,qint16,qint16,qint16,qint16)));
+                  QObject::connect(currentDevice, SIGNAL(buttonOut(qint8,bool)),
+                                   spaceNav, SLOT(buttonFromDeviceSlot(qint8,bool)));
+                }
+#endif //SPACEMELD_BUILD_EXPORT_SPACENAV
             }
             else
                 qDebug() << currentDevice->info().modelName << " launch FAILED";

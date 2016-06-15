@@ -50,12 +50,12 @@ inline const char* getString(ConnectionInterfaceType::ConnectionInterface index)
 
 namespace OutputType
 {
-enum Output {UNKNOWN = -1, X11, DBUS, WIN, MAC, LOCALSOCKET};
-inline int size(){return 5;}
+enum Output {UNKNOWN = -1, X11, DBUS, WIN, MAC, LOCALSOCKET, SPACENAV};
+inline int size(){return 6;}
 inline Output getType(int index){return static_cast<Output>(index);}
 inline const char* getString(int index)
 {
-    static const std::vector<std::string> names({"X11", "DBUS", "Win", "Mac", "Local Socket"});
+    static const std::vector<std::string> names({"X11", "DBUS", "Win", "Mac", "Local Socket", "SpaceNav"});
     return names.at(index).c_str();
 }
 inline bool showAxisButtonMap(int index)

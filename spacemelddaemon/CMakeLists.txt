@@ -103,6 +103,22 @@ if(BUILD_EXPORT_QLOCAL)
   endif(Qt5Network_FOUND)
 endif(BUILD_EXPORT_QLOCAL)
 
+if(BUILD_EXPORT_SPACENAV)
+  find_package(Qt5Network)
+  if(Qt5Network_FOUND)
+    add_definitions(-DSPACEMELD_BUILD_EXPORT_SPACENAV)
+    set(DAEMON_SPACENAV_SRCS
+        exportspacenav.cpp
+       )
+    set(DAEMON_SPACENAV_LIBS
+        Qt5::Network
+       )
+    message(STATUS "Building SpaceNav export.")
+  else(Qt5Network_FOUND)
+    message(WARNING "Not building SpaceNav export.")
+  endif(Qt5Network_FOUND)
+endif(BUILD_EXPORT_SPACENAV)
+
 #this is down here after the export dbus for the "add_definitions"
 find_package(Qt5Core REQUIRED)
 find_package(Qt5SerialPort REQUIRED)
@@ -122,6 +138,7 @@ set(DAEMON_SRCS
       ${DAEMON_WIN_SRCS}
       ${DAEMON_DBUS_SRCS}
       ${DAEMON_QLOCAL_SRCS}
+      ${DAEMON_SPACENAV_SRCS}
    )
 
 set(DAEMON_LIBS
@@ -131,6 +148,7 @@ set(DAEMON_LIBS
       ${DAEMON_WIN_LIBS}
       ${DAEMON_DBUS_LIBS}
       ${DAEMON_QLOCAL_LIBS}
+      ${DAEMON_SPACENAV_LIBS}
    )
 
 add_executable(spacemelddaemon ${DAEMON_SRCS})

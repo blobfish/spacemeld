@@ -32,6 +32,7 @@ if(UNIX)
     ${CMAKE_CURRENT_SOURCE_DIR}/qtsolutions/qtservice/src/qtunixserversocket.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/qtsolutions/qtservice/src/qtunixsocket.cpp
   )
+  option (BUILD_EXPORT_SPACENAV "Build export for Spacenav" ON)
 endif()
 if(WIN32)
   option (BUILD_EXPORT_WIN_MAG "Build export interface for WIN" ON)
