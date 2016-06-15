@@ -41,18 +41,14 @@ set(CONTROLLER_CORE_SRCS
    )
 
 if(BUILD_EXPORT_X11_MAG)
+  #at this point the controller doesn't use any x11.
+  #this is purely for controlling the gui.
   find_package(X11)
     if(X11_FOUND)
       add_definitions(-DSPACEMELD_BUILD_EXPORT_X11_MAG)
-      set(DAEMON_X11_SRCS
-            exportx11.cpp
-          )
-      set(DAEMON_X11_LIBS
-            ${X11_LIBRARIES}
-        )
-      message(STATUS "Building X11 export.")
+      message(STATUS "Enabling X11 export.")
     else(X11_FOUND)
-      message(WARNING "NOT building X11 export.")
+      message(WARNING "NOT enabling X11 export.")
     endif(X11_FOUND)
 endif(BUILD_EXPORT_X11_MAG)
 
@@ -62,14 +58,25 @@ if(BUILD_EXPORT_WIN_MAG)
 endif()
 
 if(BUILD_EXPORT_DBUS)
-  #add this point the controller use any dbus.
+  #at this point the controller doesn't use any dbus.
   #this is purely for controlling the gui.
   add_definitions(-DSPACEMELD_BUILD_EXPORT_DBUS)
-  message(STATUS "Building dbus export.")
+  message(STATUS "Enabling dbus export.")
 endif(BUILD_EXPORT_DBUS)
 
+if(BUILD_EXPORT_QLOCAL)
+  #at this point the controller doesn't use any qlocalsocket.
+  #this is purely for controlling the gui.
+  find_package(Qt5Network)
+  if(Qt5Network_FOUND)
+    add_definitions(-DSPACEMELD_BUILD_EXPORT_QLOCAL)
+    message(STATUS "Enabling QLocal export.")
+  else(Qt5Network_FOUND)
+    message(WARNING "Not Enabling QLocal export.")
+  endif(Qt5Network_FOUND)
+endif(BUILD_EXPORT_QLOCAL)
+
 find_package(Qt5Core REQUIRED)
-find_package(Qt5Network REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
 set(CONTROLLER_RESOURCES_IN
@@ -85,8 +92,8 @@ set(CONTROLLER_SRCS
 
 set(CONTROLLER_LIBS
       Qt5::Core
-      Qt5::Network
       Qt5::Widgets
+      Qt5::Network
    )
 
 add_executable(spacemeldcontroller ${CONTROLLER_SRCS})

@@ -41,6 +41,7 @@ if(WIN32)
   )
 endif()
 option (BUILD_EXPORT_DBUS "Build export interface for DBus" ON)
+option (BUILD_EXPORT_QLOCAL "Build export interace for qlocalsocket" ON)
 
 #always build daemon
 add_subdirectory(spacemelddaemon)

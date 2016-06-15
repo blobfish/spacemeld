@@ -21,6 +21,9 @@ along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef DEVICEINFO_H
 #define DEVICEINFO_H
 
+#include <vector>
+#include <string>
+
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QMap>
@@ -40,20 +43,20 @@ enum ConnectionInterface {UNKNOWN, USB, SERIAL, JOYSTICK};
 inline int size(){return 4;}
 inline const char* getString(ConnectionInterfaceType::ConnectionInterface index)
 {
-    static const char names[][10] = {"Unknown", "USB", "Serial", "Joystick"};
-    return names[index];
+    static const std::vector<std::string> names({"Unknown", "USB", "Serial", "Joystick"});
+    return names.at(index).c_str();
 }
 }
 
 namespace OutputType
 {
-enum Output {UNKNOWN = -1, X11, DBUS, WIN, MAC};
-inline int size(){return 4;}
+enum Output {UNKNOWN = -1, X11, DBUS, WIN, MAC, LOCALSOCKET};
+inline int size(){return 5;}
 inline Output getType(int index){return static_cast<Output>(index);}
 inline const char* getString(int index)
 {
-    static const char names[][10] = {"X11", "DBUS", "Win", "Mac"};
-    return names[index];
+    static const std::vector<std::string> names({"X11", "DBUS", "Win", "Mac", "Local Socket"});
+    return names.at(index).c_str();
 }
 inline bool showAxisButtonMap(int index)
 {

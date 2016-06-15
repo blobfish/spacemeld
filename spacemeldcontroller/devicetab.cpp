@@ -951,6 +951,10 @@ ExportFilterModel::ExportFilterModel(QObject *parent) : QSortFilterProxyModel(pa
 #endif
   
   //no mac yet.
+  
+#if defined(SPACEMELD_BUILD_EXPORT_QLOCAL)
+  exportPredicates[4] = true;
+#endif
 }
 
 bool ExportFilterModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const

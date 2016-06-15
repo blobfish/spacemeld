@@ -16,21 +16,16 @@
 #You should have received a copy of the GNU General Public License
 #along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 
+project(spacemeldtestqlocalsocket)
+message("\nConfiguring qlocalsocket test")
+set(CMAKE_AUTOMOC TRUE)
 
-find_package(X11)
-if(X11_FOUND)
-  add_subdirectory(X11)
-endif(X11_FOUND)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/spacemeldcommon)
 
-find_package(Qt5DBus)
-find_package(Qt5Core)
-if(Qt5DBus_FOUND AND Qt5Core_FOUND)
-  add_subdirectory(qdbus)
-endif(Qt5DBus_FOUND AND Qt5Core_FOUND)
+set(TESTQLOCALSOCKET_SRCS
+      spacemeldtestqlocalsocket.cpp
+      sockettester.cpp
+   )
 
-find_package(Qt5Core)
-find_package(Qt5Network)
-if(Qt5Core_FOUND AND Qt5Network_FOUND)
-  add_subdirectory(qlocalsocket)
-endif(Qt5Core_FOUND AND Qt5Network_FOUND)
-  
+add_executable(spacemeldtestqlocalsocket ${TESTQLOCALSOCKET_SRCS})
+TARGET_LINK_LIBRARIES(spacemeldtestqlocalsocket Qt5::Network Qt5::Core)

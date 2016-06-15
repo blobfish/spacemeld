@@ -87,9 +87,24 @@ if(BUILD_EXPORT_DBUS)
   endif(Qt5DBus_FOUND)
 endif()
 
+if(BUILD_EXPORT_QLOCAL)
+  find_package(Qt5Network)
+  if(Qt5Network_FOUND)
+    add_definitions(-DSPACEMELD_BUILD_EXPORT_QLOCAL)
+    set(DAEMON_QLOCAL_SRCS
+        exportqlocal.cpp
+       )
+    set(DAEMON_QLOCAL_LIBS
+        Qt5::Network
+       )
+    message(STATUS "Building QLocal export.")
+  else(Qt5Network_FOUND)
+    message(WARNING "Not building QLocal export.")
+  endif(Qt5Network_FOUND)
+endif(BUILD_EXPORT_QLOCAL)
+
 #this is down here after the export dbus for the "add_definitions"
 find_package(Qt5Core REQUIRED)
-find_package(Qt5Network REQUIRED)
 find_package(Qt5SerialPort REQUIRED)
 
 set(ADDITIONAL_INCLUDE_PATHS
@@ -106,15 +121,16 @@ set(DAEMON_SRCS
       ${DAEMON_X11_SRCS}
       ${DAEMON_WIN_SRCS}
       ${DAEMON_DBUS_SRCS}
+      ${DAEMON_QLOCAL_SRCS}
    )
 
 set(DAEMON_LIBS
       Qt5::Core
-      Qt5::Network
       Qt5::SerialPort
       ${DAEMON_X11_LIBS}
       ${DAEMON_WIN_LIBS}
       ${DAEMON_DBUS_LIBS}
+      ${DAEMON_QLOCAL_LIBS}
    )
 
 add_executable(spacemelddaemon ${DAEMON_SRCS})
