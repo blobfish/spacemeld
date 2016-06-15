@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <iostream>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
@@ -88,7 +89,7 @@ void InterfaceSerial::detect()
         aPort.close();
     }
 
-    qDebug() << stats;
+    std::cout << stats.toStdString();
 }
 
 bool InterfaceSerial::detectBall(QSerialPort &aPort, const QSerialPortInfo &info)

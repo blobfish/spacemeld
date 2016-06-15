@@ -18,6 +18,8 @@ You should have received a copy of the GNU General Public License
 along with SpaceMeld.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
+
 #include <QtCore/QSettings>
 #include <QtCore/QMapIterator>
 #include <QtCore/QDebug>
@@ -147,7 +149,7 @@ void dumpInfos (const DeviceInfos &infos)
         }
         stream << endl << endl;
     }
-    qDebug() << message;
+    std::cout << message.toStdString();
 }
 
 ExportInfo::ExportInfo() : type(OutputType::UNKNOWN), enabled(false)
