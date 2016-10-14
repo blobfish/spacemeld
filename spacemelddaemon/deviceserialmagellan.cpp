@@ -66,8 +66,8 @@ bool DeviceSerialMagellan::setPort(QSerialPort &aPort)
     aPort.setParity(QSerialPort::NoParity);
 
     aPort.setDataTerminalReady(true);
-    aPort.setRequestToSend(true);
-
+//     aPort.setRequestToSend(true);
+    
     if (aPort.error() != QSerialPort::NoError)
         return false;
 
